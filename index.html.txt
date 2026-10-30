@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ace.Studycore | AS Level Engine</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --accent-color: #8ab4f8;
+      --text-color: #e8eaed;
+      --subtext: #9aa0a6;
+      --border-color: #3c4043;
+      --danger: #f28b82;
+      --warning: #fdd663;
+      --success: #81c995;
+      --app-radius: 8px;
+      --app-font: system-ui, -apple-system, sans-serif;
+    }
+    body.theme-light {
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-color: #1a202c;
+      --subtext: #64748b;
+      --border-color: #e2e8f0;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    body.theme-ocean {
+      --bg-color: #0b192c;
+      --card-bg: #1e3e62;
+      --text-color: #e0f2fe;
+      --subtext: #7dd3fc;
+      --border-color: #0087d1;
+      --danger: #ff6b6b;
+      --warning: #ffd166;
+      --success: #06d6a0;
+    }
+    body.theme-cyberpunk {
+      --bg-color: #08020f;
+      --card-bg: #16032d;
+      --text-color: #00f0ff;
+      --subtext: #ff007f;
+      --border-color: #ff007f;
+      --danger: #ff0055;
+      --warning: #ffe600;
+      --success: #00ff66;
+    }
+    body.theme-dracula {
+      --bg-color: #282a36;
+      --card-bg: #343746;
+      --text-color: #f8f8f2;
+      --subtext: #bd93f9;
+      --border-color: #6272a4;
+      --danger: #ff5555;
+      --warning: #ffb86c;
+      --success: #50fa7b;
+    }
+    body.theme-nord {
+      --bg-color: #2e3440;
+      --card-bg: #3b4252;
+      --text-color: #eceff4;
+      --subtext: #88c0d0;
+      --border-color: #4c566a;
+      --danger: #bf616a;
+      --warning: #ebcb8b;
+      --success: #a3be8c;
+    }
+    body.theme-solarized {
+      --bg-color: #002b36;
+      --card-bg: #073642;
+      --text-color: #93a1a1;
+      --subtext: #2aa198;
+      --border-color: #586e75;
+      --danger: #dc322f;
+      --warning: #b58900;
+      --success: #859900;
+    }
+    body.theme-synthwave {
+      --bg-color: #17072b;
+      --card-bg: #2a0845;
+      --text-color: #fca311;
+      --subtext: #ff758f;
+      --border-color: #7209b7;
+      --danger: #f72585;
+      --warning: #4cc9f0;
+      --success: #3a0ca3;
+    }
+    body.theme-tokyonight {
+      --bg-color: #1a1b26;
+      --card-bg: #24283b;
+      --text-color: #c0caf5;
+      --subtext: #bb9af7;
+      --border-color: #414868;
+      --danger: #f7768e;
+      --warning: #e0af68;
+      --success: #9ece6a;
+    }
+    body.theme-gruvbox {
+      --bg-color: #1d2021;
+      --card-bg: #282828;
+      --text-color: #fbf1c7;
+      --subtext: #d5c4a1;
+      --border-color: #504945;
+      --danger: #fb4934;
+      --warning: #fabd2f;
+      --success: #b8bb26;
+    }
+    body.theme-catppuccin {
+      --bg-color: #181825;
+      --card-bg: #1e1e2e;
+      --text-color: #cdd6f4;
+      --subtext: #f5c2e7;
+      --border-color: #313244;
+      --danger: #f38ba8;
+      --warning: #f9e2af;
+      --success: #a6e3a1;
+    }
+    body.theme-monokai {
+      --bg-color: #19181a;
+      --card-bg: #221f22;
+      --text-color: #fcfcfa;
+      --subtext: #a9dc76;
+      --border-color: #403e41;
+      --danger: #ff6188;
+      --warning: #ffd866;
+      --success: #78dce8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--app-font); }
+    body { background-color: var(--bg-color); color: var(--text-color); padding: 16px; min-height: 100vh; transition: background-color 0.3s, color 0.3s; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+    .brand { font-size: 24px; font-weight: bold; color: var(--accent-color); transition: color 0.3s; }
+    .header-info { display: flex; gap: 12px; align-items: center; font-size: 14px; flex-wrap: wrap; }
+    .theme-select { padding: 6px 12px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: var(--app-radius); cursor: pointer; }
+
+    nav { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; }
+    nav button { padding: 8px 16px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: var(--app-radius); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    nav button.active { background: var(--accent-color); color: #000; font-weight: bold; border-color: var(--accent-color); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--app-radius); padding: 16px; margin-bottom: 16px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+    .class-banner { background: var(--card-bg); border: 1px solid var(--accent-color); border-left: 6px solid var(--accent-color); border-radius: var(--app-radius); padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; transition: border-color 0.3s; }
+    .class-tag { font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--accent-color); letter-spacing: 0.5px; transition: color 0.3s; }
+    .class-title { font-size: 16px; font-weight: bold; margin-top: 2px; }
+
+    .events-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 8px 0; }
+    .event-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--app-radius); min-width: 220px; flex-shrink: 0; }
+    .event-progress-bar { width: 100%; height: 6px; background: var(--border-color); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .event-progress-fill { height: 100%; background: var(--accent-color); transition: width 0.3s, background-color 0.3s; }
+
+    .big-counter { font-size: 42px; font-weight: bold; color: var(--accent-color); text-align: center; margin: 8px 0; transition: color 0.3s; }
+
+    .subject-card { border: 1px solid var(--border-color); border-radius: var(--app-radius); padding: 12px; background: var(--bg-color); display: flex; flex-direction: column; transition: border-left-color 0.3s; }
+    .subject-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .subject-title { font-weight: bold; }
+    .mini-pie-wrap { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--subtext); }
+
+    .chap-list { list-style: none; font-size: 14px; max-height: 180px; overflow-y: auto; flex: 1; }
+    .chap-list li { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 6px; padding-right: 4px; }
+    .chap-left { display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; }
+    .btn-del-sm { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; font-weight: bold; padding: 0 4px; }
+
+    .pie-container { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    th, td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+    th { background: var(--bg-color); }
+    input, select, button.btn { padding: 8px 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); outline: none; }
+    button.btn { cursor: pointer; transition: opacity 0.2s, background-color 0.3s, color 0.3s; }
+    button.btn:hover { opacity: 0.85; }
+    button.btn-primary { background: var(--accent-color); color: #000; font-weight: bold; border: none; }
+
+    .badge { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; }
+    .badge-danger { background: var(--danger); color: #000; }
+    .badge-warning { background: var(--warning); color: #000; }
+    .badge-success { background: var(--success); color: #000; }
+
+    .input-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* Theme Controls & Primary Interface Color Switcher */
+    .color-swatch-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+    .color-picker-badge { display: flex; align-items: center; gap: 6px; background: var(--bg-color); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: var(--app-radius); font-size: 12px; }
+    .color-picker-badge input[type="color"] { width: 22px; height: 22px; border: none; padding: 0; background: none; cursor: pointer; border-radius: 50%; }
+    .color-picker-badge input[type="text"] { width: 68px; font-family: monospace; font-size: 11px; padding: 2px 4px; text-transform: lowercase; }
+
+    .primary-theme-selector { display: flex; align-items: center; justify-content: space-between; background: var(--bg-color); border: 1px solid var(--accent-color); padding: 10px 14px; border-radius: var(--app-radius); margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    
+    .custom-section-title { font-size: 12px; font-weight: bold; color: var(--accent-color); margin: 12px 0 6px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="brand">ace.Studycore</div>
+      <div id="header-date" style="font-size: 13px; color: var(--subtext); font-weight: 500;"></div>
+    </div>
+    <div class="header-info">
+      <button class="btn" style="font-size:12px; padding:6px 12px;" onclick="toggleThemeModal()">🎨 Interface Customizer</button>
+      <select class="theme-select" id="theme-dropdown" onchange="changeTheme(this.value)">
+        <option value="dark">Google Dark</option>
+        <option value="light">Material Light</option>
+        <option value="ocean">Ocean</option>
+        <option value="cyberpunk">Cyberpunk</option>
+        <option value="dracula">Dracula</option>
+        <option value="nord">Nord</option>
+        <option value="solarized">Solarized Dark</option>
+        <option value="synthwave">Synthwave '84</option>
+        <option value="tokyonight">Tokyo Night</option>
+        <option value="gruvbox">Gruvbox Dark</option>
+        <option value="catppuccin">Catppuccin Mocha</option>
+        <option value="monokai">Monokai Pro</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Dynamic Class Banner -->
+  <div class="class-banner">
+    <div>
+      <div class="class-tag">Scheduled Today</div>
+      <div class="class-title" id="banner-class-title">Detecting today's schedule...</div>
+    </div>
+    <div id="banner-class-time" style="font-weight: bold; font-family: monospace; font-size: 15px; color: var(--accent-color);"></div>
+  </div>
+
+  <nav>
+    <button class="active" onclick="switchTab('progress-pie', this)">Progress Pie</button>
+    <button onclick="switchTab('grade-tracker', this)">Grade Tracker</button>
+    <button onclick="switchTab('clipboard', this)">Clipboard</button>
+    <button onclick="switchTab('homework', this)">Homework</button>
+    <button onclick="switchTab('ppq', this)">PPQ Log</button>
+    <button onclick="switchTab('ppq-booklets', this)">PPQ Booklets</button>
+    <button onclick="switchTab('pomodoro', this)">Pomodoro</button>
+  </nav>
+
+  <!-- TAB 1: PROGRESS PIE -->
+  <div id="progress-pie" class="tab-content active">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+        <h3>Upcoming Events & Timeline Progress</h3>
+        <button class="btn btn-primary" onclick="toggleAddEventForm()">+ Add Timeline Event</button>
+      </div>
+
+      <div id="event-form" class="input-group" style="display:none; background: var(--bg-color); padding: 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); margin-bottom: 12px;">
+        <input type="text" id="evt-name" placeholder="Event Name (e.g., Board Exams)" style="flex:1; min-width:160px;">
+        <div><label style="font-size:11px; display:block; color:var(--subtext);">Start Date</label><input type="date" id="evt-start"></div>
+        <div><label style="font-size:11px; display:block; color:var(--subtext);">Finish Date</label><input type="date" id="evt-end"></div>
+        <div style="display:flex; align-items:flex-end;"><button class="btn btn-primary" onclick="saveEvent()">Save Event</button></div>
+      </div>
+
+      <div class="events-scroll" id="events-list"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Days Till Nearest Target / Exam</h3>
+        <div class="big-counter" id="nearest-exam-days">--</div>
+        <div id="nearest-exam-title" style="text-align:center; color: var(--subtext);">No Event Configured</div>
+      </div>
+      <div class="card">
+        <h3>Revision Speed Calculator</h3>
+        <div style="margin-top: 10px; line-height: 1.8;">
+          <div>Total Number of Chapters: <strong id="calc-total">0</strong></div>
+          <div>Overall AS Completion: <strong id="calc-completion">0%</strong></div>
+          <div>Chapters Covered: <strong id="calc-covered">0</strong></div>
+          <div>Chapters Left: <strong id="calc-left">0</strong></div>
+          <div>Required Pace: <strong id="calc-pace">0</strong> chapters/day</div>
+          <div>Pace Status: <span id="calc-status" class="badge badge-success">On Track</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pie-container" style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">
+        <svg width="140" height="140" viewBox="0 0 32 32">
+          <circle r="16" cx="16" cy="16" fill="#3c4043"/>
+          <circle id="pie-slice" r="8" cx="16" cy="16" fill="transparent" stroke="var(--accent-color)" stroke-width="16" stroke-dasharray="0 100" transform="rotate(-90 16 16)"/>
+        </svg>
+        <div>
+          <h3>Overall AS Syllabus Completion</h3>
+          <p style="color: var(--subtext); font-size:13px; margin-top:4px;">Check completed chapters below. Modify chapters per subject as needed.</p>
+        </div>
+      </div>
+
+      <h3 style="margin-bottom: 12px;">Subject Breakdown</h3>
+      <div class="grid-3" id="subject-cards"></div>
+    </div>
+  </div>
+
+  <!-- TAB 2: GRADE TRACKER -->
+  <div id="grade-tracker" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <h3>Grade & Score Trend Visualizer</h3>
+        <button class="btn" style="font-size:12px; padding:4px 10px;" onclick="toggleGradeSettings()">⚙️ Chart Settings</button>
+      </div>
+
+      <div id="gt-settings-panel" style="display:none; background:var(--bg-color); border:1px solid var(--border-color); border-radius:var(--app-radius); padding:12px; margin-bottom:12px;">
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+          <div>
+            <label style="font-size:11px; display:block; color:var(--subtext);">Filter Subject</label>
+            <select id="gt-chart-filter" class="theme-select" onchange="renderGradeGraph()"></select>
+          </div>
+          <div>
+            <label style="font-size:11px; display:block; color:var(--subtext);">Target Score Line (%)</label>
+            <input type="number" id="gt-target-score" value="80" min="0" max="100" style="width:80px; padding:4px 8px;" onchange="renderGradeGraph()">
+          </div>
+          <div>
+            <label style="font-size:11px; display:block; color:var(--subtext);">Y-Min Axis</label>
+            <input type="number" id="gt-axis-min" value="0" min="0" max="90" style="width:70px; padding:4px 8px;" onchange="renderGradeGraph()">
+          </div>
+          <div>
+            <label style="font-size:11px; display:block; color:var(--subtext);">Y-Max Axis</label>
+            <input type="number" id="gt-axis-max" value="100" min="10" max="100" style="width:70px; padding:4px 8px;" onchange="renderGradeGraph()">
+          </div>
+        </div>
+      </div>
+
+      <div style="width:100%; height:260px; position:relative; background:var(--bg-color); border-radius:var(--app-radius); border:1px solid var(--border-color); padding:12px;">
+        <canvas id="gradeTrendCanvas" style="width:100%; height:100%; display:block;"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Logged Component Scores</h3>
+      <table>
+        <thead>
+          <tr><th>Subject</th><th>Exam / Component</th><th>Score</th><th>Percentage</th><th>Grade</th><th>Action</th></tr>
+        </thead>
+        <tbody id="grade-table-body"></tbody>
+      </table>
+
+      <div class="input-group">
+        <input type="text" id="gt-sub" placeholder="Subject (e.g. Physics)" style="flex:1;">
+        <input type="text" id="gt-comp" placeholder="Exam / Component" style="flex:1;">
+        <input type="number" id="gt-score" placeholder="Score Obtained" style="width:120px;">
+        <input type="number" id="gt-total" placeholder="Max Score" style="width:100px;">
+        <button class="btn btn-primary" onclick="addGradeScore()">Add Score</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: CLIPBOARD -->
+  <div id="clipboard" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2>Clipboard</h2>
+        <button class="btn btn-primary" style="font-size:18px; padding:6px 16px; border-radius:50%; font-weight:bold;" onclick="toggleNewClipboardModal()" title="New Clipboard">+</button>
+      </div>
+
+      <!-- New Clipboard Form -->
+      <div id="new-clipboard-modal" style="display:none; background:var(--bg-color); border:2px solid var(--accent-color); border-radius:var(--app-radius); padding:16px; margin-bottom:20px;">
+        <h4 style="margin-bottom:12px; color:var(--accent-color);">+ New Clipboard</h4>
+        <div class="input-group" style="margin-top:0;">
+          <input type="text" id="cb-name-input" placeholder="Clip board name :" style="flex:2; min-width:180px;">
+          <input type="date" id="cb-date-input" style="flex:1; min-width:140px;">
+          <button class="btn btn-primary" onclick="createClipboard()">Create Clipboard</button>
+          <button class="btn" onclick="toggleNewClipboardModal()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Clipboards Grid Layout -->
+      <div class="grid-2" id="clipboards-container"></div>
+    </div>
+  </div>
+
+  <!-- TAB 4: HOMEWORK -->
+  <div id="homework" class="tab-content">
+    <div class="card">
+      <h3>Homework & Assignments</h3>
+      <table>
+        <thead>
+          <tr><th style="width:50px;">Done</th><th>Subject</th><th>Task Description</th><th>Due Date</th></tr>
+        </thead>
+        <tbody id="hw-table-body"></tbody>
+      </table>
+
+      <div class="input-group">
+        <input type="text" id="hw-sub" placeholder="Subject" style="flex:1;">
+        <input type="text" id="hw-task" placeholder="Task details" style="flex:2;">
+        <input type="date" id="hw-date">
+        <button class="btn btn-primary" onclick="addHW()">Add Homework</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: PPQ LOG -->
+  <div id="ppq" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" id="ppq-subtab-btn-log" onclick="switchPPQSubTab('ppq-main-log', this)">All PPQ Logs</button>
+          <button class="btn" id="ppq-subtab-btn-codes" onclick="switchPPQSubTab('ppq-paper-codes', this)">By Syllabus & Component Code</button>
+        </div>
+        <div style="font-size:15px; font-weight:bold; background:var(--bg-color); padding:6px 14px; border-radius:var(--app-radius); border:1px solid var(--border-color);">
+          Overall Average Score: <span id="ppq-avg-score" style="color:var(--accent-color);">0%</span>
+        </div>
+      </div>
+
+      <div id="ppq-main-log" class="ppq-subtab-content">
+        <table>
+          <thead>
+            <tr><th>Subject</th><th>Syllabus Code</th><th>Paper Code</th><th>Component Code</th><th>Score %</th><th>Date</th><th>Action</th></tr>
+          </thead>
+          <tbody id="ppq-table-body"></tbody>
+        </table>
+
+        <div class="input-group">
+          <input type="text" id="ppq-sub" placeholder="Subject (e.g. Physics)" style="flex:1;">
+          <input type="text" id="ppq-syl-code" placeholder="Syllabus Code (e.g. 9702)" style="flex:1;">
+          <input type="text" id="ppq-paper-code" placeholder="Paper Code (e.g. m/j/23)" style="flex:1;">
+          <input type="text" id="ppq-comp" placeholder="Component Code (e.g. 22)" style="flex:1;">
+          <input type="number" id="ppq-score" placeholder="Score %" style="width:100px;">
+          <input type="date" id="ppq-date">
+          <button class="btn btn-primary" onclick="addPPQ()">Log Paper</button>
+        </div>
+      </div>
+
+      <div id="ppq-paper-codes" class="ppq-subtab-content" style="display:none;">
+        <h4 style="margin-bottom:12px; color:var(--subtext);">Organized by Syllabus Code & Sorted by Component Code</h4>
+        <div id="ppq-diagram-container" style="display:flex; flex-direction:column; gap:16px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: PPQ BOOKLETS -->
+  <div id="ppq-booklets" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <h3>PPQ Booklet Tracker</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" onclick="toggleWorkbookForm()">+ Workbook</button>
+          <button class="btn btn-primary" onclick="toggleTopicalForm()">+ Topical</button>
+        </div>
+      </div>
+
+      <!-- Workbook Form -->
+      <div id="workbook-form" class="input-group" style="display:none; background: var(--bg-color); padding: 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); margin-bottom: 12px;">
+        <h4 style="width:100%; font-size:13px; color:var(--accent-color);">+ Add Workbook Entry</h4>
+        <input type="text" id="wb-sub" placeholder="Subject (e.g. Math)" style="width:130px;">
+        <input type="text" id="wb-chap" placeholder="Chapter (e.g. chap 1)" style="flex:1;">
+        <input type="number" id="wb-done" placeholder="pages completed" style="width:140px;">
+        <input type="number" id="wb-total" placeholder="Total Pages" style="width:130px;">
+        <button class="btn btn-primary" onclick="addWorkbookItem()">Add Row</button>
+      </div>
+
+      <!-- Topical Form -->
+      <div id="topical-form" class="input-group" style="display:none; background: var(--bg-color); padding: 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); margin-bottom: 12px;">
+        <h4 style="width:100%; font-size:13px; color:var(--accent-color);">+ Add Topical Entry</h4>
+        <input type="text" id="top-sub" placeholder="Subject (e.g. Physics)" style="width:130px;">
+        <input type="text" id="top-topic" placeholder="Topic (e.g. Waves)" style="flex:1;">
+        <input type="number" id="top-done" placeholder="pages completed" style="width:140px;">
+        <input type="number" id="top-total" placeholder="Total Pages" style="width:130px;">
+        <button class="btn btn-primary" onclick="addTopicalItem()">Add Row</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card" style="margin-bottom:0; background: var(--bg-color);">
+          <div style="font-size:18px; font-weight:bold; margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+            <span>+ Workbook</span>
+            <button class="btn" style="font-size:11px; padding:2px 8px;" onclick="toggleWorkbookForm()">+ Add</button>
+          </div>
+          <div id="workbook-container"></div>
+        </div>
+
+        <div class="card" style="margin-bottom:0; background: var(--bg-color);">
+          <div style="font-size:18px; font-weight:bold; margin-bottom:12px; border-bottom:1px solid var(--border-color); padding-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+            <span>+ Topical</span>
+            <button class="btn" style="font-size:11px; padding:2px 8px;" onclick="toggleTopicalForm()">+ Add</button>
+          </div>
+          <div id="topical-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 7: POMODORO -->
+  <div id="pomodoro" class="tab-content">
+    <div class="card" style="text-align:center; max-width: 500px; margin: 0 auto;">
+      <h3>Adjustable Focus Timer</h3>
+      
+      <div class="input-group" style="justify-content:center; margin-bottom:16px;">
+        <div>
+          <label style="font-size:11px; color:var(--subtext);">Focus Time (Mins)</label>
+          <input type="number" id="pomo-input-min" value="25" min="1" max="180" style="width:90px; text-align:center;">
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button class="btn btn-primary" onclick="applyCustomPomo()">Set Timer</button>
+        </div>
+      </div>
+
+      <div class="big-counter" id="pomo-display" style="font-size:64px;">25:00</div>
+
+      <div style="margin-top: 16px; display:flex; gap:12px; justify-content:center;">
+        <button class="btn btn-primary" style="padding: 10px 24px;" onclick="startPomo()" id="pomo-start-btn">Start</button>
+        <button class="btn" style="padding: 10px 24px;" onclick="pausePomo()" id="pomo-pause-btn">Pause</button>
+        <button class="btn" style="padding: 10px 24px;" onclick="resetPomo()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLOR & INTERFACE CUSTOMIZER MODAL -->
+  <div id="theme-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1100; align-items:center; justify-content:center;">
+    <div class="card" style="width:90%; max-width:560px; max-height:88vh; overflow-y:auto; background:var(--card-bg); border:1px solid var(--border-color); box-shadow:0 8px 24px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3>Interface & Color Customizer</h3>
+        <button class="btn-del-sm" onclick="toggleThemeModal()" style="font-size:20px;">&times;</button>
+      </div>
+      <p style="font-size:12px; color:var(--subtext); margin-bottom:12px;">Customize theme accents, UI background tints, fonts, corner radius, and subject-specific colors.</p>
+      
+      <div class="primary-theme-selector">
+        <span style="font-weight:bold;">Main Accent Color</span>
+        <div class="color-picker-badge">
+          <input type="color" id="primary-accent-picker" value="#8ab4f8" onchange="updatePrimaryAccent(this.value)">
+          <span>#</span>
+          <input type="text" id="primary-accent-hex" value="8ab4f8" maxlength="6" oninput="updatePrimaryAccentFromHex(this.value)">
+        </div>
+      </div>
+
+      <div class="custom-section-title">Granular UI Colors & Styling</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+        <div class="color-picker-badge" style="justify-content:space-between;">
+          <span style="font-size:11px;">Background</span>
+          <input type="color" id="ui-bg-picker" value="#121212" onchange="updateCustomUIProp('--bg-color', this.value)">
+        </div>
+        <div class="color-picker-badge" style="justify-content:space-between;">
+          <span style="font-size:11px;">Card Panel</span>
+          <input type="color" id="ui-card-picker" value="#1e1e1e" onchange="updateCustomUIProp('--card-bg', this.value)">
+        </div>
+        <div class="color-picker-badge" style="justify-content:space-between;">
+          <span style="font-size:11px;">Primary Text</span>
+          <input type="color" id="ui-text-picker" value="#e8eaed" onchange="updateCustomUIProp('--text-color', this.value)">
+        </div>
+        <div class="color-picker-badge" style="justify-content:space-between;">
+          <span style="font-size:11px;">Muted Text</span>
+          <input type="color" id="ui-subtext-picker" value="#9aa0a6" onchange="updateCustomUIProp('--subtext', this.value)">
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+        <div>
+          <label style="font-size:11px; display:block; color:var(--subtext); margin-bottom:4px;">Corner Roundness</label>
+          <select id="ui-radius-select" class="theme-select" style="width:100%;" onchange="updateAppRadius(this.value)">
+            <option value="0px">Sharp Square (0px)</option>
+            <option value="6px">Modern Slight (6px)</option>
+            <option value="12px" selected>Rounded Soft (12px)</option>
+            <option value="20px">Pill / Curved (20px)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px; display:block; color:var(--subtext); margin-bottom:4px;">Font Style</label>
+          <select id="ui-font-select" class="theme-select" style="width:100%;" onchange="updateAppFont(this.value)">
+            <option value="system-ui, -apple-system, sans-serif">System Sans-Serif</option>
+            <option value="'Courier New', monospace">Monospace Code</option>
+            <option value="Georgia, serif">Classic Serif</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="custom-section-title">Subject Graph & Progress Colors</div>
+      <div id="custom-color-inputs" style="display:flex; flex-direction:column; gap:10px; max-height:200px; overflow-y:auto; padding-right:4px;"></div>
+
+      <div style="display:flex; justify-content:space-between; margin-top:16px; gap:8px;">
+        <button class="btn" onclick="resetDefaultColors()">Reset Defaults</button>
+        <button class="btn btn-primary" onclick="saveCustomColors()">Save & Apply Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PPQ Edit Modal -->
+  <div id="ppq-edit-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; align-items:center; justify-content:center;">
+    <div class="card" style="width:90%; max-width:450px; background:var(--card-bg); border:1px solid var(--border-color); box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3>Edit PPQ Entry</h3>
+        <button class="btn-del-sm" onclick="closePPQModal()" style="font-size:20px;">&times;</button>
+      </div>
+      <input type="hidden" id="edit-ppq-idx">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div>
+          <label style="font-size:12px; color:var(--subtext);">Subject</label>
+          <input type="text" id="edit-ppq-sub" style="width:100%;">
+        </div>
+        <div>
+          <label style="font-size:12px; color:var(--subtext);">Syllabus Code</label>
+          <input type="text" id="edit-ppq-syl" style="width:100%;">
+        </div>
+        <div>
+          <label style="font-size:12px; color:var(--subtext);">Paper Code</label>
+          <input type="text" id="edit-ppq-paper" style="width:100%;">
+        </div>
+        <div>
+          <label style="font-size:12px; color:var(--subtext);">Component Code</label>
+          <input type="text" id="edit-ppq-comp" style="width:100%;">
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div style="flex:1;">
+            <label style="font-size:12px; color:var(--subtext);">Score %</label>
+            <input type="number" id="edit-ppq-score" style="width:100%;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-size:12px; color:var(--subtext);">Date</label>
+            <input type="date" id="edit-ppq-date" style="width:100%;">
+          </div>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+          <button class="btn" onclick="closePPQModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="savePPQEdit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_AS_DATA = {
+      "Physics": ["Physical Quantities & Units", "Kinematics", "Dynamics", "Forces, Density & Pressure", "Work, Energy & Power", "Deformation of Solids", "Waves & Doppler Effect", "Superposition", "Current Electricity", "D.C. Circuits", "Particle Physics"],
+      "Chemistry": ["Atomic Structure", "Atoms, Molecules & Stoichiometry", "Chemical Bonding", "States of Matter", "Chemical Energetics", "Electrochemistry", "Equilibria", "Reaction Kinetics", "Periodicity", "Group 2 & 17", "Organic Intro & Hydrocarbons"],
+      "Biology": ["Cell Structure", "Biological Molecules", "Enzymes", "Cell Membranes & Transport", "Mitosis", "Nucleic Acids", "Transport in Plants", "Transport in Mammals", "Gas Exchange", "Infectious Diseases", "Immunity"],
+      "Pure Math": ["Quadratics", "Functions", "Coordinate Geometry", "Circular Measure", "Trigonometry", "Series", "Differentiation", "Integration"],
+      "Statistics": ["Representation of Data", "Permutations & Combinations", "Probability", "Discrete Random Variables", "Normal Distribution"],
+      "English": ["Textual Analysis & Style", "Directed Writing & Form Features", "Comparative Analysis"]
+    };
+
+    const DEFAULT_COLORS = {
+      'biology': '#81c995',
+      'physics': '#c58af9',
+      'chemistry': '#8ab4f8',
+      'pure math': '#ffb74d',
+      'statistics': '#ffb74d',
+      'english': '#fdd663'
+    };
+
+    let asData = JSON.parse(localStorage.getItem('ace_as_data')) || DEFAULT_AS_DATA;
+    let checkedChaps = JSON.parse(localStorage.getItem('ace_checked')) || {};
+    let customSubjectColors = JSON.parse(localStorage.getItem('ace_custom_colors')) || { ...DEFAULT_COLORS };
+    let primaryAccentColor = localStorage.getItem('ace_primary_accent') || '#8ab4f8';
+    let currentBaseTheme = localStorage.getItem('ace_base_theme') || 'dark';
+
+    let customUIProps = JSON.parse(localStorage.getItem('ace_custom_ui_props')) || {};
+    let appRadius = localStorage.getItem('ace_app_radius') || '8px';
+    let appFont = localStorage.getItem('ace_app_font') || 'system-ui, -apple-system, sans-serif';
+
+    let events = JSON.parse(localStorage.getItem('ace_events_v2')) || [
+      { name: 'AS Prelims', start: '2026-10-01', end: '2026-12-15' }
+    ];
+    let gradesList = JSON.parse(localStorage.getItem('ace_grades')) || [
+      { subject: 'Physics', component: 'Half-Yearly Theory', score: 32, total: 60, pct: 53.3, grade: 'D' },
+      { subject: 'Chemistry', component: 'Half-Yearly MCQ', score: 19, total: 39, pct: 48.7, grade: 'E' }
+    ];
+    let hwList = JSON.parse(localStorage.getItem('ace_hw')) || [];
+    let ppqList = JSON.parse(localStorage.getItem('ace_ppq')) || [
+      { sub: 'Physics', sylCode: '9702', paperCode: 's23_qp_22', comp: '22', score: '78', date: '2026-10-15' },
+      { sub: 'Physics', sylCode: '9702', paperCode: 'w23_qp_22', comp: '22', score: '82', date: '2026-10-18' },
+      { sub: 'Chemistry', sylCode: '9701', paperCode: 's23_qp_12', comp: '12', score: '65', date: '2026-10-20' }
+    ];
+    let workbookList = JSON.parse(localStorage.getItem('ace_workbook')) || [
+      { sub: 'Math', chap: 'chap 1', done: 67, total: 100 },
+      { sub: 'Math', chap: 'chap 2', done: 200, total: 200 },
+      { sub: 'Bio', chap: 'chap 1', done: 80, total: 80 },
+      { sub: 'Bio', chap: 'chap 7', done: 60, total: 80 }
+    ];
+    let topicalList = JSON.parse(localStorage.getItem('ace_topical')) || [
+      { sub: 'Physics', topic: 'Waves', done: 67, total: 70 }
+    ];
+    let clipboards = JSON.parse(localStorage.getItem('ace_clipboards')) || [
+      {
+        id: 1,
+        name: 'Physics Practice',
+        finalDate: '2026-11-10',
+        tasks: [
+          { text: 'Complete Chapter 1 Past Papers', completed: false },
+          { text: 'Review Doppler Effect formulas', completed: true }
+        ]
+      }
+    ];
+
+    function applyPrimaryAccentToCSS(colorHex) {
+      document.documentElement.style.setProperty('--accent-color', colorHex, 'important');
+      let picker = document.getElementById('primary-accent-picker');
+      let textInput = document.getElementById('primary-accent-hex');
+      if (picker) picker.value = colorHex;
+      if (textInput) textInput.value = colorHex.replace('#', '');
+    }
+
+    function updateCustomUIProp(prop, val) {
+      customUIProps[prop] = val;
+      document.documentElement.style.setProperty(prop, val, 'important');
+    }
+
+    function updateAppRadius(val) {
+      appRadius = val;
+      document.documentElement.style.setProperty('--app-radius', val, 'important');
+    }
+
+    function updateAppFont(val) {
+      appFont = val;
+      document.documentElement.style.setProperty('--app-font', val, 'important');
+    }
+
+    function updatePrimaryAccent(colorHex) {
+      primaryAccentColor = colorHex;
+      applyPrimaryAccentToCSS(colorHex);
+    }
+
+    function updatePrimaryAccentFromHex(val) {
+      let cleanHex = '#' + val.replace('#', '');
+      if (/^#[0-9A-F]{6}$/i.test(cleanHex)) {
+        primaryAccentColor = cleanHex;
+        applyPrimaryAccentToCSS(cleanHex);
+      }
+    }
+
+    function getSubjectColor(subName) {
+      if (!subName) return primaryAccentColor;
+      let key = subName.toLowerCase().trim();
+      return customSubjectColors[key] || customSubjectColors['physics'] || primaryAccentColor;
+    }
+
+    function toggleThemeModal() {
+      const modal = document.getElementById('theme-modal');
+      const isVisible = modal.style.display === 'flex';
+      modal.style.display = isVisible ? 'none' : 'flex';
+
+      if (!isVisible) {
+        applyPrimaryAccentToCSS(primaryAccentColor);
+        document.getElementById('ui-radius-select').value = appRadius;
+        document.getElementById('ui-font-select').value = appFont;
+        renderCustomColorInputs();
+      }
+    }
+
+    function renderCustomColorInputs() {
+      const container = document.getElementById('custom-color-inputs');
+      container.innerHTML = '';
+
+      for (let sub in asData) {
+        let key = sub.toLowerCase().trim();
+        let colorHex = customSubjectColors[key] || '#8ab4f8';
+
+        container.innerHTML += `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-color); padding:8px 12px; border-radius:var(--app-radius); border:1px solid var(--border-color);">
+            <span style="font-weight:bold;">${sub}</span>
+            <div class="color-picker-badge">
+              <input type="color" value="${colorHex}" onchange="updateHexFromPicker('${key}', this.value)">
+              <span>#</span>
+              <input type="text" id="hex-input-${key.replace(/\s+/g, '')}" value="${colorHex.replace('#', '')}" maxlength="6" oninput="updatePickerFromHex('${key}', this.value)">
+            </div>
+          </div>`;
+      }
+    }
+
+    function updateHexFromPicker(key, hexVal) {
+      customSubjectColors[key] = hexVal;
+      let textInput = document.getElementById(`hex-input-${key.replace(/\s+/g, '')}`);
+      if (textInput) textInput.value = hexVal.replace('#', '');
+    }
+
+    function updatePickerFromHex(key, val) {
+      let cleanHex = '#' + val.replace('#', '');
+      if (/^#[0-9A-F]{6}$/i.test(cleanHex)) {
+        customSubjectColors[key] = cleanHex;
+      }
+    }
+
+    function saveCustomColors() {
+      localStorage.setItem('ace_custom_colors', JSON.stringify(customSubjectColors));
+      localStorage.setItem('ace_primary_accent', primaryAccentColor);
+      localStorage.setItem('ace_custom_ui_props', JSON.stringify(customUIProps));
+      localStorage.setItem('ace_app_radius', appRadius);
+      localStorage.setItem('ace_app_font', appFont);
+
+      toggleThemeModal();
+      renderSubjects();
+      renderGradeGraph();
+      renderPPQ();
+    }
+
+    function resetDefaultColors() {
+      customSubjectColors = { ...DEFAULT_COLORS };
+      primaryAccentColor = '#8ab4f8';
+      customUIProps = {};
+      appRadius = '8px';
+      appFont = 'system-ui, -apple-system, sans-serif';
+
+      localStorage.removeItem('ace_custom_colors');
+      localStorage.removeItem('ace_primary_accent');
+      localStorage.removeItem('ace_custom_ui_props');
+      localStorage.removeItem('ace_app_radius');
+      localStorage.removeItem('ace_app_font');
+
+      for (let prop in customUIProps) {
+        document.documentElement.style.removeProperty(prop);
+      }
+      document.documentElement.style.removeProperty('--app-radius');
+      document.documentElement.style.removeProperty('--app-font');
+
+      applyPrimaryAccentToCSS(primaryAccentColor);
+      renderCustomColorInputs();
+      renderSubjects();
+      renderGradeGraph();
+      renderPPQ();
+    }
+
+    function toggleGradeSettings() {
+      const panel = document.getElementById('gt-settings-panel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function changeTheme(theme) {
+      currentBaseTheme = theme;
+      localStorage.setItem('ace_base_theme', theme);
+      document.body.className = theme === 'dark' ? '' : 'theme-' + theme;
+      
+      applyPrimaryAccentToCSS(primaryAccentColor);
+      for (let prop in customUIProps) {
+        document.documentElement.style.setProperty(prop, customUIProps[prop], 'important');
+      }
+      document.documentElement.style.setProperty('--app-radius', appRadius, 'important');
+      document.documentElement.style.setProperty('--app-font', appFont, 'important');
+    }
+
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+
+      if (id === 'grade-tracker') {
+        setTimeout(renderGradeGraph, 50);
+      }
+    }
+
+    function toggleChap(key) {
+      checkedChaps[key] = !checkedChaps[key];
+      localStorage.setItem('ace_checked', JSON.stringify(checkedChaps));
+      renderSubjects();
+    }
+
+    function addChapter(sub) {
+      let input = document.getElementById(`add-chap-${sub.replace(/\s+/g, '')}`);
+      if (!input) return;
+      let val = input.value.trim();
+      if (val) {
+        asData[sub].push(val);
+        localStorage.setItem('ace_as_data', JSON.stringify(asData));
+        input.value = '';
+        renderSubjects();
+      }
+    }
+
+    function removeChapter(sub, idx) {
+      let chap = asData[sub][idx];
+      delete checkedChaps[`${sub}-${chap}`];
+      asData[sub].splice(idx, 1);
+      localStorage.setItem('ace_as_data', JSON.stringify(asData));
+      localStorage.setItem('ace_checked', JSON.stringify(checkedChaps));
+      renderSubjects();
+    }
+
+    function toggleAddEventForm() {
+      let form = document.getElementById('event-form');
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function saveEvent() {
+      let name = document.getElementById('evt-name').value.trim();
+      let start = document.getElementById('evt-start').value;
+      let end = document.getElementById('evt-end').value;
+
+      if (name && start && end) {
+        events.push({ name, start, end });
+        localStorage.setItem('ace_events_v2', JSON.stringify(events));
+        document.getElementById('evt-name').value = '';
+        toggleAddEventForm();
+        renderEvents();
+      }
+    }
+
+    function renderEvents() {
+      const el = document.getElementById('events-list');
+      el.innerHTML = '';
+      let nearestDays = 9999;
+      let nearestName = 'No Event';
+      const today = new Date();
+
+      events.forEach((e, idx) => {
+        let startDate = new Date(e.start);
+        let endDate = new Date(e.end);
+
+        let totalDuration = endDate - startDate;
+        let elapsed = today - startDate;
+        let progressPct = 0;
+
+        if (totalDuration > 0) {
+          progressPct = Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)));
+        }
+
+        let daysRemaining = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+        if (daysRemaining < 0) daysRemaining = 0;
+
+        if (daysRemaining > 0 && daysRemaining < nearestDays) {
+          nearestDays = daysRemaining;
+          nearestName = e.name;
+        }
+
+        el.innerHTML += `
+          <div class="event-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong>${e.name}</strong>
+              <button class="btn-del-sm" onclick="deleteEvent(${idx})">&times;</button>
+            </div>
+            <div style="font-size:12px; color:var(--subtext); margin-top:4px;">${daysRemaining} days remaining</div>
+            <div class="event-progress-bar">
+              <div class="event-progress-fill" style="width: ${progressPct}%;"></div>
+            </div>
+            <div style="font-size:10px; color:var(--subtext); margin-top:4px; text-align:right;">${progressPct}% Elapsed</div>
+          </div>`;
+      });
+
+      document.getElementById('nearest-exam-days').innerText = nearestDays !== 9999 ? nearestDays : '--';
+      document.getElementById('nearest-exam-title').innerText = nearestName;
+    }
+
+    function deleteEvent(idx) {
+      events.splice(idx, 1);
+      localStorage.setItem('ace_events_v2', JSON.stringify(events));
+      renderEvents();
+    }
+
+    function renderGradesTable() {
+      let tbody = document.getElementById('grade-table-body');
+      tbody.innerHTML = '';
+      gradesList.forEach((g, idx) => {
+        let subColor = getSubjectColor(g.subject);
+        tbody.innerHTML += `
+          <tr>
+            <td style="color:${subColor}; font-weight:bold;">${g.subject}</td>
+            <td>${g.component}</td>
+            <td>${g.score}/${g.total}</td>
+            <td>${g.pct}%</td>
+            <td><span class="badge ${g.pct >= 70 ? 'badge-success' : g.pct >= 50 ? 'badge-warning' : 'badge-danger'}">${g.grade}</span></td>
+            <td><button class="btn-del-sm" onclick="deleteGrade(${idx})">&times;</button></td>
+          </tr>`;
+      });
+
+      populateChartFilter();
+      renderGradeGraph();
+    }
+
+    function populateChartFilter() {
+      const select = document.getElementById('gt-chart-filter');
+      if (!select) return;
+      const currentVal = select.value;
+      select.innerHTML = '<option value="ALL">All Subjects</option>';
+
+      for (let sub in asData) {
+        select.innerHTML += `<option value="${sub}">${sub}</option>`;
+      }
+      select.value = currentVal || 'ALL';
+    }
+
+    function renderGradeGraph() {
+      const canvas = document.getElementById('gradeTrendCanvas');
+      if (!canvas) return;
+
+      const filter = document.getElementById('gt-chart-filter') ? document.getElementById('gt-chart-filter').value : 'ALL';
+      const minAxis = parseFloat(document.getElementById('gt-axis-min')?.value) || 0;
+      const maxAxis = parseFloat(document.getElementById('gt-axis-max')?.value) || 100;
+      const targetLine = parseFloat(document.getElementById('gt-target-score')?.value) || 80;
+
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let filteredGrades = filter === 'ALL' 
+        ? gradesList 
+        : gradesList.filter(g => g.subject.toLowerCase() === filter.toLowerCase());
+
+      const padding = 45;
+      const w = canvas.width - padding * 2;
+      const h = canvas.height - padding * 2;
+
+      const yRange = Math.max(10, maxAxis - minAxis);
+
+      ctx.strokeStyle = '#3c4043';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#9aa0a6';
+      ctx.font = '10px sans-serif';
+
+      for (let i = 0; i <= 4; i++) {
+        let y = padding + (h / 4) * i;
+        let pctVal = Math.round(maxAxis - (i * yRange / 4));
+
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(padding + w, y);
+        ctx.stroke();
+
+        ctx.fillText(`${pctVal}%`, 5, y + 3);
+      }
+
+      if (targetLine >= minAxis && targetLine <= maxAxis) {
+        let targetY = padding + h - ((targetLine - minAxis) / yRange) * h;
+        ctx.beginPath();
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = '#fdd663';
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(padding, targetY);
+        ctx.lineTo(padding + w, targetY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = '#fdd663';
+        ctx.font = '9px sans-serif';
+        ctx.fillText(`Target (${targetLine}%)`, padding + w - 55, targetY - 4);
+      }
+
+      if (filteredGrades.length === 0) {
+        ctx.fillStyle = '#9aa0a6';
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('No score data recorded for graph', canvas.width / 2, canvas.height / 2);
+        return;
+      }
+
+      const examCategories = [];
+      filteredGrades.forEach(g => {
+        const examName = (g.component || 'Exam').trim();
+        if (!examCategories.includes(examName)) {
+          examCategories.push(examName);
+        }
+      });
+
+      const examXPositions = {};
+      examCategories.forEach((examName, index) => {
+        const xPos = examCategories.length === 1
+          ? padding + w / 2
+          : padding + (w / (examCategories.length - 1)) * index;
+        examXPositions[examName] = xPos;
+
+        ctx.fillStyle = '#9aa0a6';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(examName, xPos, padding + h + 20);
+      });
+
+      const groupedBySubject = {};
+      filteredGrades.forEach((g) => {
+        const subKey = g.subject.toLowerCase();
+        if (!groupedBySubject[subKey]) groupedBySubject[subKey] = [];
+        groupedBySubject[subKey].push(g);
+      });
+
+      Object.keys(groupedBySubject).forEach((subKey) => {
+        const items = groupedBySubject[subKey];
+        const lineColor = getSubjectColor(subKey);
+
+        items.sort((a, b) => examCategories.indexOf((a.component || 'Exam').trim()) - examCategories.indexOf((b.component || 'Exam').trim()));
+
+        const points = items.map(g => {
+          const examName = (g.component || 'Exam').trim();
+          const x = examXPositions[examName];
+          let clampedPct = Math.max(minAxis, Math.min(maxAxis, g.pct));
+          const y = padding + h - ((clampedPct - minAxis) / yRange) * h;
+          return { x, y, pct: g.pct, examName, sub: g.subject };
+        });
+
+        ctx.beginPath();
+        ctx.strokeStyle = lineColor;
+        ctx.lineWidth = 2.5;
+
+        points.forEach((pt, i) => {
+          if (i === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.stroke();
+
+        points.forEach(pt => {
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = lineColor;
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = '#e8eaed';
+          ctx.font = 'bold 10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(`${pt.pct}%`, pt.x, pt.y - 8);
+        });
+      });
+    }
+
+    window.addEventListener('resize', renderGradeGraph);
+
+    function addGradeScore() {
+      let subject = document.getElementById('gt-sub').value.trim();
+      let component = document.getElementById('gt-comp').value.trim();
+      let score = parseFloat(document.getElementById('gt-score').value);
+      let total = parseFloat(document.getElementById('gt-total').value);
+
+      if (subject && component && !isNaN(score) && !isNaN(total) && total > 0) {
+        let pct = parseFloat(((score / total) * 100).toFixed(1));
+        let grade = pct >= 80 ? 'A' : pct >= 70 ? 'B' : pct >= 60 ? 'C' : pct >= 50 ? 'D' : pct >= 40 ? 'E' : 'U';
+        gradesList.push({ subject, component, score, total, pct, grade });
+        localStorage.setItem('ace_grades', JSON.stringify(gradesList));
+        document.getElementById('gt-sub').value = '';
+        document.getElementById('gt-comp').value = '';
+        document.getElementById('gt-score').value = '';
+        document.getElementById('gt-total').value = '';
+        renderGradesTable();
+      }
+    }
+
+    function deleteGrade(idx) {
+      gradesList.splice(idx, 1);
+      localStorage.setItem('ace_grades', JSON.stringify(gradesList));
+      renderGradesTable();
+    }
+
+    function updateDateAndSchedule() {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const now = new Date();
+      document.getElementById('header-date').innerText = `${days[now.getDay()]}, ${now.toLocaleDateString()}`;
+
+      let schedules = {
+        1: { name: "Mindship (Ivana)", time: "5:30 PM - 6:30 PM" },
+        2: { name: "Physics", time: "6:30 PM - 7:30 PM" },
+        3: { name: "Biology", time: "7:00 PM - 8:00 PM" },
+        4: { name: "Physics", time: "6:30 PM - 7:30 PM" },
+        5: { name: "Biology", time: "7:00 PM - 8:00 PM" },
+        6: { name: "Physics", time: "6:30 PM - 7:30 PM" },
+        0: { name: "Biology", time: "7:00 PM - 8:00 PM" }
+      };
+
+      let todaySchedule = schedules[now.getDay()];
+      document.getElementById('banner-class-title').innerText = todaySchedule.name;
+      document.getElementById('banner-class-time').innerText = todaySchedule.time;
+    }
+
+    function renderSubjects() {
+      const container = document.getElementById('subject-cards');
+      container.innerHTML = '';
+      let totalAll = 0, completedAll = 0;
+
+      for (let sub in asData) {
+        let card = document.createElement('div');
+        card.className = 'subject-card';
+        
+        let subColor = getSubjectColor(sub);
+        card.style.borderLeft = `4px solid ${subColor}`;
+
+        let subTotal = asData[sub].length;
+        let subCompleted = 0;
+
+        asData[sub].forEach(chap => {
+          if (checkedChaps[`${sub}-${chap}`]) subCompleted++;
+        });
+
+        totalAll += subTotal;
+        completedAll += subCompleted;
+
+        let subPct = subTotal > 0 ? Math.round((subCompleted / subTotal) * 100) : 0;
+
+        let html = `
+          <div class="subject-header">
+            <span class="subject-title" style="color:${subColor};">${sub}</span>
+            <div class="mini-pie-wrap">
+              <svg width="24" height="24" viewBox="0 0 32 32">
+                <circle r="16" cx="16" cy="16" fill="#3c4043"/>
+                <circle r="8" cx="16" cy="16" fill="transparent" stroke="${subColor}" stroke-width="16" stroke-dasharray="${subPct} 100" transform="rotate(-90 16 16)"/>
+              </svg>
+              <span style="color:${subColor}; font-weight:bold;">${subPct}%</span>
+            </div>
+          </div>
+          <ul class="chap-list">`;
+        
+        asData[sub].forEach((chap, idx) => {
+          let key = `${sub}-${chap}`;
+          let isChecked = checkedChaps[key] ? 'checked' : '';
+          html += `
+            <li>
+              <div class="chap-left">
+                <input type="checkbox" ${isChecked} onchange="toggleChap('${key}')">
+                <span>${chap}</span>
+              </div>
+              <button class="btn-del-sm" onclick="removeChapter('${sub}', ${idx})">&times;</button>
+            </li>`;
+        });
+
+        html += `</ul>
+          <div style="margin-top:8px; display:flex; gap:4px;">
+            <input type="text" id="add-chap-${sub.replace(/\s+/g, '')}" placeholder="New chapter..." style="flex:1; font-size:12px; padding:4px 6px;">
+            <button class="btn btn-primary" style="font-size:12px; padding:4px 8px; background:${subColor}; color:#000;" onclick="addChapter('${sub}')">Add</button>
+          </div>`;
+
+        card.innerHTML = html;
+        container.appendChild(card);
+      }
+
+      let overallPct = totalAll > 0 ? Math.round((completedAll / totalAll) * 100) : 0;
+      document.getElementById('pie-slice').setAttribute('stroke-dasharray', `${overallPct} 100`);
+      
+      document.getElementById('calc-total').innerText = totalAll;
+      document.getElementById('calc-completion').innerText = overallPct + '%';
+      document.getElementById('calc-covered').innerText = completedAll;
+      document.getElementById('calc-left').innerText = (totalAll - completedAll);
+
+      let targetDays = parseInt(document.getElementById('nearest-exam-days').innerText);
+      if (!isNaN(targetDays) && targetDays > 0) {
+        let pace = ((totalAll - completedAll) / targetDays).toFixed(1);
+        document.getElementById('calc-pace').innerText = pace;
+      } else {
+        document.getElementById('calc-pace').innerText = '0';
+      }
+    }
+
+    function toggleNewClipboardModal() {
+      const modal = document.getElementById('new-clipboard-modal');
+      modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function createClipboard() {
+      const nameInput = document.getElementById('cb-name-input');
+      const dateInput = document.getElementById('cb-date-input');
+      const name = nameInput.value.trim();
+      const finalDate = dateInput.value;
+
+      if (name && finalDate) {
+        clipboards.push({
+          id: Date.now(),
+          name: name,
+          finalDate: finalDate,
+          tasks: []
+        });
+        localStorage.setItem('ace_clipboards', JSON.stringify(clipboards));
+        nameInput.value = '';
+        dateInput.value = '';
+        toggleNewClipboardModal();
+        renderClipboards();
+      }
+    }
+
+    function deleteClipboard(cbId) {
+      clipboards = clipboards.filter(c => c.id !== cbId);
+      localStorage.setItem('ace_clipboards', JSON.stringify(clipboards));
+      renderClipboards();
+    }
+
+    function addCBTask(cbId) {
+      const input = document.getElementById(`cb-task-input-${cbId}`);
+      if (!input) return;
+      const text = input.value.trim();
+
+      if (text) {
+        const cb = clipboards.find(c => c.id === cbId);
+        if (cb) {
+          cb.tasks.push({ text: text, completed: false });
+          localStorage.setItem('ace_clipboards', JSON.stringify(clipboards));
+          renderClipboards();
+        }
+      }
+    }
+
+    function removeCBTask(cbId, taskIndex) {
+      const cb = clipboards.find(c => c.id === cbId);
+      if (cb) {
+        cb.tasks.splice(taskIndex, 1);
+        localStorage.setItem('ace_clipboards', JSON.stringify(clipboards));
+        renderClipboards();
+      }
+    }
+
+    function toggleCBTask(cbId, taskIndex) {
+      const cb = clipboards.find(c => c.id === cbId);
+      if (cb) {
+        cb.tasks[taskIndex].completed = !cb.tasks[taskIndex].completed;
+        cb.tasks.sort((a, b) => Number(a.completed) - Number(b.completed));
+        localStorage.setItem('ace_clipboards', JSON.stringify(clipboards));
+        renderClipboards();
+      }
+    }
+
+    function formatDateDisplay(dateStr) {
+      if (!dateStr) return 'm/m/yy';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear().toString().slice(-2)}`;
+    }
+
+    function getDaysCountdownText(dateStr) {
+      if (!dateStr) return '';
+      const target = new Date(dateStr);
+      if (isNaN(target.getTime())) return '';
+      
+      const today = new Date();
+      // Reset hours for accurate day difference calculation
+      today.setHours(0, 0, 0, 0);
+      target.setHours(0, 0, 0, 0);
+
+      const diffTime = target - today;
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays > 1) {
+        return `<span style="color:var(--accent-color); font-weight:normal; margin-left:6px;">(${diffDays} days left)</span>`;
+      } else if (diffDays === 1) {
+        return `<span style="color:var(--warning); font-weight:normal; margin-left:6px;">(Due tomorrow)</span>`;
+      } else if (diffDays === 0) {
+        return `<span style="color:var(--success); font-weight:bold; margin-left:6px;">(Due today)</span>`;
+      } else {
+        return `<span style="color:var(--danger); font-weight:normal; margin-left:6px;">(${Math.abs(diffDays)} days overdue)</span>`;
+      }
+    }
+
+    function renderClipboards() {
+      const container = document.getElementById('clipboards-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (clipboards.length === 0) {
+        container.innerHTML = '<div style="color:var(--subtext); font-size:14px; grid-column:1/-1;">No clipboards created yet. Click the <strong>+</strong> button above to add one.</div>';
+        return;
+      }
+
+      clipboards.forEach((cb) => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg); border:2px solid var(--border-color); border-radius:var(--app-radius); padding:16px; display:flex; flex-direction:column; position:relative;';
+
+        let formattedDate = formatDateDisplay(cb.finalDate);
+        let countdownBadge = getDaysCountdownText(cb.finalDate);
+
+        let tasksHtml = '';
+        cb.tasks.forEach((task, idx) => {
+          tasksHtml += `
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--border-color);">
+              <div style="display:flex; align-items:center; gap:8px; flex:1; overflow:hidden;">
+                <button class="btn-del-sm" onclick="removeCBTask(${cb.id}, ${idx})" title="Remove task">x</button>
+                <span style="${task.completed ? 'text-decoration:line-through; color:var(--subtext);' : 'font-weight:500;'}">+ ${task.text}</span>
+              </div>
+              <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleCBTask(${cb.id}, ${idx})" style="width:18px; height:18px; cursor:pointer;">
+            </div>`;
+        });
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--subtext); margin-bottom:8px; font-weight:bold;">
+            <span>Final date : ${formattedDate} ${countdownBadge}</span>
+            <button class="btn-del-sm" onclick="deleteClipboard(${cb.id})" title="Delete Clipboard" style="font-size:16px;">&times;</button>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--accent-color); padding-bottom:8px; margin-bottom:12px;">
+            <h3 style="font-size:18px; color:var(--text-color);">${cb.name}</h3>
+            <button class="btn btn-primary" style="padding:2px 8px; font-size:14px;" onclick="document.getElementById('cb-add-row-${cb.id}').style.display = 'flex'">+</button>
+          </div>
+
+          <div id="cb-add-row-${cb.id}" style="display:none; gap:6px; margin-bottom:12px;">
+            <input type="text" id="cb-task-input-${cb.id}" placeholder="New task..." style="flex:1; font-size:12px; padding:4px 8px;">
+            <button class="btn btn-primary" style="font-size:12px; padding:4px 10px;" onclick="addCBTask(${cb.id})">Add</button>
+          </div>
+
+          <div style="flex:1;">
+            ${tasksHtml || '<div style="font-size:12px; color:var(--subtext); font-style:italic; padding:8px 0;">No tasks added yet. Click + to add tasks.</div>'}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function switchPPQSubTab(subtabId, btn) {
+      document.querySelectorAll('.ppq-subtab-content').forEach(el => el.style.display = 'none');
+      document.getElementById('ppq-subtab-btn-log').className = 'btn';
+      document.getElementById('ppq-subtab-btn-codes').className = 'btn';
+
+      document.getElementById(subtabId).style.display = 'block';
+      btn.className = 'btn btn-primary';
+    }
+
+    function renderHW() {
+      let tbody = document.getElementById('hw-table-body');
+      tbody.innerHTML = '';
+      hwList.forEach((item, idx) => {
+        let subColor = getSubjectColor(item.sub);
+        tbody.innerHTML += `
+          <tr>
+            <td style="text-align:center;"><input type="checkbox" onchange="completeHW(${idx})"></td>
+            <td style="color:${subColor}; font-weight:bold;">${item.sub}</td>
+            <td>${item.task}</td>
+            <td>${item.date}</td>
+          </tr>`;
+      });
+    }
+
+    function addHW() {
+      let sub = document.getElementById('hw-sub').value.trim();
+      let task = document.getElementById('hw-task').value.trim();
+      let date = document.getElementById('hw-date').value;
+
+      if (sub && task && date) {
+        hwList.push({ sub, task, date });
+        localStorage.setItem('ace_hw', JSON.stringify(hwList));
+        document.getElementById('hw-sub').value = '';
+        document.getElementById('hw-task').value = '';
+        document.getElementById('hw-date').value = '';
+        renderHW();
+      }
+    }
+
+    function completeHW(idx) {
+      hwList.splice(idx, 1);
+      localStorage.setItem('ace_hw', JSON.stringify(hwList));
+      renderHW();
+    }
+
+    function renderPPQ() {
+      let tbody = document.getElementById('ppq-table-body');
+      tbody.innerHTML = '';
+      let totalScore = 0;
+
+      ppqList.forEach((item, idx) => {
+        totalScore += parseFloat(item.score) || 0;
+        let subColor = getSubjectColor(item.sub);
+        tbody.innerHTML += `
+          <tr>
+            <td style="color:${subColor}; font-weight:bold;">${item.sub}</td>
+            <td>${item.sylCode || item.code || 'N/A'}</td>
+            <td>${item.paperCode || 'N/A'}</td>
+            <td>${item.comp || 'N/A'}</td>
+            <td>${item.score}%</td>
+            <td>${item.date}</td>
+            <td>
+              <button class="btn" style="font-size:11px; padding:2px 6px; margin-right:4px;" onclick="openPPQModal(${idx})">Edit</button>
+              <button class="btn-del-sm" onclick="deletePPQ(${idx})">&times;</button>
+            </td>
+          </tr>`;
+      });
+
+      let avg = ppqList.length > 0 ? (totalScore / ppqList.length).toFixed(1) : 0;
+      document.getElementById('ppq-avg-score').innerText = avg + '%';
+
+      renderPPQDiagramView();
+    }
+
+    function openPPQModal(idx) {
+      let item = ppqList[idx];
+      if (!item) return;
+
+      document.getElementById('edit-ppq-idx').value = idx;
+      document.getElementById('edit-ppq-sub').value = item.sub || '';
+      document.getElementById('edit-ppq-syl').value = item.sylCode || item.code || '';
+      document.getElementById('edit-ppq-paper').value = item.paperCode || '';
+      document.getElementById('edit-ppq-comp').value = item.comp || '';
+      document.getElementById('edit-ppq-score').value = item.score || '';
+      document.getElementById('edit-ppq-date').value = item.date || '';
+
+      document.getElementById('ppq-edit-modal').style.display = 'flex';
+    }
+
+    function closePPQModal() {
+      document.getElementById('ppq-edit-modal').style.display = 'none';
+    }
+
+    function savePPQEdit() {
+      let idx = parseInt(document.getElementById('edit-ppq-idx').value);
+      if (isNaN(idx) || idx < 0 || idx >= ppqList.length) return;
+
+      let sub = document.getElementById('edit-ppq-sub').value.trim();
+      let sylCode = document.getElementById('edit-ppq-syl').value.trim();
+      let paperCode = document.getElementById('edit-ppq-paper').value.trim();
+      let comp = document.getElementById('edit-ppq-comp').value.trim();
+      let score = document.getElementById('edit-ppq-score').value.trim();
+      let date = document.getElementById('edit-ppq-date').value.trim();
+
+      if (sub && sylCode && score && date) {
+        ppqList[idx] = { sub, sylCode, paperCode, comp, score, date };
+        localStorage.setItem('ace_ppq', JSON.stringify(ppqList));
+        closePPQModal();
+        renderPPQ();
+      }
+    }
+
+    function addPPQ() {
+      let sub = document.getElementById('ppq-sub').value.trim();
+      let sylCode = document.getElementById('ppq-syl-code').value.trim();
+      let paperCode = document.getElementById('ppq-paper-code').value.trim();
+      let comp = document.getElementById('ppq-comp').value.trim();
+      let score = document.getElementById('ppq-score').value;
+      let date = document.getElementById('ppq-date').value;
+
+      if (sub && sylCode && score && date) {
+        ppqList.push({ sub, sylCode, paperCode: paperCode || 'N/A', comp: comp || 'N/A', score, date });
+        localStorage.setItem('ace_ppq', JSON.stringify(ppqList));
+        document.getElementById('ppq-sub').value = '';
+        document.getElementById('ppq-syl-code').value = '';
+        document.getElementById('ppq-paper-code').value = '';
+        document.getElementById('ppq-comp').value = '';
+        document.getElementById('ppq-score').value = '';
+        document.getElementById('ppq-date').value = '';
+        renderPPQ();
+      }
+    }
+
+    function renderPPQDiagramView() {
+      const container = document.getElementById('ppq-diagram-container');
+      container.innerHTML = '';
+
+      if (ppqList.length === 0) {
+        container.innerHTML = '<div style="color:var(--subtext);">No PPQ entries logged yet.</div>';
+        return;
+      }
+
+      let groupedBySyllabus = {};
+      ppqList.forEach((item, idx) => {
+        let syl = item.sylCode || item.code || 'Uncategorized';
+        if (!groupedBySyllabus[syl]) groupedBySyllabus[syl] = [];
+        groupedBySyllabus[syl].push({ ...item, _originalIndex: idx });
+      });
+
+      for (let sylCode in groupedBySyllabus) {
+        let items = groupedBySyllabus[sylCode];
+        let total = items.reduce((sum, i) => sum + parseFloat(i.score || 0), 0);
+        let avg = (total / items.length).toFixed(1);
+        let subColor = getSubjectColor(items[0].sub);
+
+        items.sort((a, b) => (a.comp || '').localeCompare(b.comp || ''));
+
+        let card = document.createElement('div');
+        card.className = 'card';
+        card.style.marginBottom = '0';
+
+        let html = `
+          <div style="font-size:18px; font-weight:bold; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <span>Syllabus code : <mark style="background:${subColor}; color:#000; padding:2px 8px; border-radius:var(--app-radius);">${sylCode}</mark> (${items[0].sub})</span>
+            <span style="font-size:14px; font-weight:normal; color:var(--subtext);">Sorted by component code</span>
+          </div>
+          
+          <div style="border:1px solid var(--border-color); border-radius:var(--app-radius); padding:12px; background:var(--bg-color);">
+            <div style="margin-bottom:8px; font-weight:bold; color:var(--subtext);">Component & Score Overview:</div>
+        `;
+
+        items.forEach((entry) => {
+          html += `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border-color);">
+              <div><strong>Component Code:</strong> ${entry.comp} <span style="color:var(--subtext); font-size:12px;">(${entry.paperCode})</span></div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <strong>Score:</strong> <span style="color:${subColor}; font-weight:bold;">${entry.score}%</span>
+                <button class="btn" style="font-size:11px; padding:2px 6px;" onclick="openPPQModal(${entry._originalIndex})">Edit</button>
+              </div>
+            </div>`;
+        });
+
+        html += `
+          </div>
+          
+          <div style="margin-top:12px; font-size:15px; font-weight:bold; color:var(--text-color);">
+            Overall average score: <span style="color:var(--success);">${avg}%</span>
+          </div>
+
+          <details style="margin-top:12px; background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--app-radius); padding:8px 12px;">
+            <summary style="cursor:pointer; font-weight:bold; color:${subColor};">+ Show paper code breakdown details</summary>
+            <div style="margin-top:8px;">
+        `;
+
+        items.forEach(entry => {
+          html += `
+            <div style="padding:6px 0; border-bottom:1px dashed var(--border-color);">
+              <div>+ <strong>paper code :</strong> ${entry.paperCode} (Comp: ${entry.comp})</div>
+              <div style="margin-left:16px; display:flex; justify-content:space-between; align-items:center;">
+                <span><strong>Score :</strong> ${entry.score}% <span style="font-size:11px; color:var(--subtext);">[Logged: ${entry.date}]</span></span>
+                <button class="btn" style="font-size:11px; padding:2px 6px;" onclick="openPPQModal(${entry._originalIndex})">Edit Entry</button>
+              </div>
+            </div>`;
+        });
+
+        html += `
+            </div>
+          </details>
+        `;
+
+        card.innerHTML = html;
+        container.appendChild(card);
+      }
+    }
+
+    function deletePPQ(idx) {
+      ppqList.splice(idx, 1);
+      localStorage.setItem('ace_ppq', JSON.stringify(ppqList));
+      renderPPQ();
+    }
+
+    function toggleWorkbookForm() {
+      let form = document.getElementById('workbook-form');
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function toggleTopicalForm() {
+      let form = document.getElementById('topical-form');
+      form.style.display = form.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function addWorkbookItem() {
+      let sub = document.getElementById('wb-sub').value.trim();
+      let chap = document.getElementById('wb-chap').value.trim();
+      let done = parseInt(document.getElementById('wb-done').value);
+      let total = parseInt(document.getElementById('wb-total').value);
+
+      if (sub && chap && !isNaN(done) && !isNaN(total) && total > 0) {
+        workbookList.push({ sub, chap, done, total });
+        localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+        document.getElementById('wb-sub').value = '';
+        document.getElementById('wb-chap').value = '';
+        document.getElementById('wb-done').value = '';
+        document.getElementById('wb-total').value = '';
+        toggleWorkbookForm();
+        renderBooklets();
+      }
+    }
+
+    function addTopicalItem() {
+      let sub = document.getElementById('top-sub').value.trim();
+      let topic = document.getElementById('top-topic').value.trim();
+      let done = parseInt(document.getElementById('top-done').value);
+      let total = parseInt(document.getElementById('top-total').value);
+
+      if (sub && topic && !isNaN(done) && !isNaN(total) && total > 0) {
+        topicalList.push({ sub, topic, done, total });
+        localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+        document.getElementById('top-sub').value = '';
+        document.getElementById('top-topic').value = '';
+        document.getElementById('top-done').value = '';
+        document.getElementById('top-total').value = '';
+        toggleTopicalForm();
+        renderBooklets();
+      }
+    }
+
+    function deleteWorkbookItem(idx) {
+      workbookList.splice(idx, 1);
+      localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+      renderBooklets();
+    }
+
+    function deleteTopicalItem(idx) {
+      topicalList.splice(idx, 1);
+      localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+      renderBooklets();
+    }
+
+    function renderBooklets() {
+      const wbContainer = document.getElementById('workbook-container');
+      wbContainer.innerHTML = '';
+
+      if (workbookList.length === 0) {
+        wbContainer.innerHTML = '<div style="color:var(--subtext); font-size:13px;">No workbook entries added yet.</div>';
+      } else {
+        let groupedBySub = {};
+        workbookList.forEach((item, idx) => {
+          let s = item.sub;
+          if (!groupedBySub[s]) groupedBySub[s] = [];
+          groupedBySub[s].push({ ...item, _idx: idx });
+        });
+
+        for (let subName in groupedBySub) {
+          let subColor = getSubjectColor(subName);
+          let items = groupedBySub[subName];
+
+          let section = document.createElement('div');
+          section.style.marginBottom = '16px';
+
+          let html = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-weight:bold; color:${subColor}; font-size:15px;">${subName}</span>
+              <span style="font-size:11px; color:var(--subtext);">${items.length} chapters/topics</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--subtext); font-size:11px; margin-bottom:6px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
+              <span style="flex:1;">Chapter</span>
+              <span style="width:140px; text-align:center;">pages completed</span>
+              <span style="width:50px; text-align:right;">%</span>
+              <span style="width:24px;"></span>
+            </div>
+          `;
+
+          items.forEach(item => {
+            let pct = item.total > 0 ? Math.min(100, ((item.done / item.total) * 100)).toFixed(1) : 0;
+            if (pct % 1 === 0) pct = parseInt(pct);
+            let isComplete = item.done >= item.total;
+
+            html += `
+              <div style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed var(--border-color);">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+                  <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                    <input type="checkbox" ${isComplete ? 'checked' : ''} onchange="toggleWorkbookComplete(${item._idx})">
+                    <span style="${isComplete ? 'text-decoration:line-through; opacity:0.7;' : 'font-weight:500;'}">${item.chap}</span>
+                  </div>
+                  
+                  <div style="width:140px; display:flex; align-items:center; justify-content:center; gap:4px;">
+                    <input type="number" value="${item.done}" min="0" max="${item.total}" style="width:52px; padding:2px 4px; font-size:12px; text-align:center;" onchange="updateWorkbookPages(${item._idx}, this.value, ${item.total})">
+                    <span style="font-size:12px; color:var(--subtext);">/</span>
+                    <input type="number" value="${item.total}" min="1" style="width:52px; padding:2px 4px; font-size:12px; text-align:center;" onchange="updateWorkbookTotalPages(${item._idx}, this.value)">
+                  </div>
+
+                  <span style="width:50px; text-align:right; font-weight:bold; color:${isComplete ? 'var(--success)' : 'var(--text-color)'};">${pct}%</span>
+                  <button class="btn-del-sm" style="width:24px; text-align:right;" onclick="deleteWorkbookItem(${item._idx})">&times;</button>
+                </div>
+                
+                <div style="width:100%; height:5px; background:var(--border-color); border-radius:3px; margin-top:6px; overflow:hidden;">
+                  <div style="height:100%; width:${pct}%; background:${subColor}; transition:width 0.3s;"></div>
+                </div>
+              </div>`;
+          });
+
+          section.innerHTML = html;
+          wbContainer.appendChild(section);
+        }
+      }
+
+      const topContainer = document.getElementById('topical-container');
+      topContainer.innerHTML = '';
+
+      if (topicalList.length === 0) {
+        topContainer.innerHTML = '<div style="color:var(--subtext); font-size:13px;">No topical entries added yet.</div>';
+      } else {
+        let html = `
+          <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--subtext); font-size:11px; margin-bottom:8px; border-bottom:1px solid var(--border-color); padding-bottom:4px;">
+            <span style="width:70px;">Subject</span>
+            <span style="flex:1;">Topic</span>
+            <span style="width:140px; text-align:center;">pages completed</span>
+            <span style="width:45px; text-align:right;">%</span>
+            <span style="width:24px;"></span>
+          </div>`;
+
+        topicalList.forEach((item, idx) => {
+          let subColor = getSubjectColor(item.sub);
+          let pct = item.total > 0 ? Math.min(100, ((item.done / item.total) * 100)).toFixed(1) : 0;
+          if (pct % 1 === 0) pct = parseInt(pct);
+          let isComplete = item.done >= item.total;
+
+          html += `
+            <div style="margin-bottom:8px; padding-bottom:8px; border-bottom:1px dashed var(--border-color);">
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+                <span style="width:70px; font-weight:bold; color:${subColor}; font-size:12px;">${item.sub}</span>
+                <div style="display:flex; align-items:center; gap:6px; flex:1;">
+                  <input type="checkbox" ${isComplete ? 'checked' : ''} onchange="toggleTopicalComplete(${idx})">
+                  <span style="${isComplete ? 'text-decoration:line-through; opacity:0.7;' : 'font-weight:500;'}">${item.topic}</span>
+                </div>
+
+                <div style="width:140px; display:flex; align-items:center; justify-content:center; gap:4px;">
+                  <input type="number" value="${item.done}" min="0" max="${item.total}" style="width:52px; padding:2px 4px; font-size:12px; text-align:center;" onchange="updateTopicalPages(${idx}, this.value, ${item.total})">
+                  <span style="font-size:12px; color:var(--subtext);">/</span>
+                  <input type="number" value="${item.total}" min="1" style="width:52px; padding:2px 4px; font-size:12px; text-align:center;" onchange="updateTopicalTotalPages(${idx}, this.value)">
+                </div>
+
+                <span style="width:45px; text-align:right; font-weight:bold; color:${isComplete ? 'var(--success)' : 'var(--text-color)'};">${pct}%</span>
+                <button class="btn-del-sm" style="width:24px; text-align:right;" onclick="deleteTopicalItem(${idx})">&times;</button>
+              </div>
+
+              <div style="width:100%; height:5px; background:var(--border-color); border-radius:3px; margin-top:6px; overflow:hidden;">
+                <div style="height:100%; width:${pct}%; background:${subColor}; transition:width 0.3s;"></div>
+              </div>
+            </div>`;
+        });
+
+        topContainer.innerHTML = html;
+      }
+    }
+
+    function updateWorkbookPages(idx, val, total) {
+      let num = parseInt(val) || 0;
+      workbookList[idx].done = Math.min(total, Math.max(0, num));
+      localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+      renderBooklets();
+    }
+
+    function updateWorkbookTotalPages(idx, val) {
+      let total = parseInt(val) || 1;
+      workbookList[idx].total = Math.max(1, total);
+      if (workbookList[idx].done > workbookList[idx].total) {
+        workbookList[idx].done = workbookList[idx].total;
+      }
+      localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+      renderBooklets();
+    }
+
+    function toggleWorkbookComplete(idx) {
+      if (workbookList[idx].done >= workbookList[idx].total) {
+        workbookList[idx].done = 0;
+      } else {
+        workbookList[idx].done = workbookList[idx].total;
+      }
+      localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+      renderBooklets();
+    }
+
+    function updateTopicalPages(idx, val, total) {
+      let num = parseInt(val) || 0;
+      topicalList[idx].done = Math.min(total, Math.max(0, num));
+      localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+      renderBooklets();
+    }
+
+    function updateTopicalTotalPages(idx, val) {
+      let total = parseInt(val) || 1;
+      topicalList[idx].total = Math.max(1, total);
+      if (topicalList[idx].done > topicalList[idx].total) {
+        topicalList[idx].done = topicalList[idx].total;
+      }
+      localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+      renderBooklets();
+    }
+
+    function toggleTopicalComplete(idx) {
+      if (topicalList[idx].done >= topicalList[idx].total) {
+        topicalList[idx].done = 0;
+      } else {
+        topicalList[idx].done = topicalList[idx].total;
+      }
+      localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+      renderBooklets();
+    }
+
+    let pomoTimeLeft = 25 * 60;
+    let pomoTimerId = null;
+
+    function applyCustomPomo() {
+      let mins = parseInt(document.getElementById('pomo-input-min').value) || 25;
+      pomoTimeLeft = mins * 60;
+      updatePomoDisplay();
+      if (pomoTimerId) resetPomo();
+    }
+
+    function updatePomoDisplay() {
+      let m = Math.floor(pomoTimeLeft / 60);
+      let s = pomoTimeLeft % 60;
+      document.getElementById('pomo-display').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function startPomo() {
+      if (pomoTimerId) return;
+      pomoTimerId = setInterval(() => {
+        if (pomoTimeLeft > 0) {
+          pomoTimeLeft--;
+          updatePomoDisplay();
+        } else {
+          clearInterval(pomoTimerId);
+          pomoTimerId = null;
+        }
+      }, 1000);
+    }
+
+    function pausePomo() {
+      if (pomoTimerId) {
+        clearInterval(pomoTimerId);
+        pomoTimerId = null;
+      }
+    }
+
+    function resetPomo() {
+      pausePomo();
+      applyCustomPomo();
+    }
+
+    window.onload = function() {
+      document.getElementById('theme-dropdown').value = currentBaseTheme;
+      changeTheme(currentBaseTheme);
+      updateDateAndSchedule();
+      renderSubjects();
+      renderEvents();
+      renderGradesTable();
+      renderClipboards();
+      renderHW();
+      renderPPQ();
+      renderBooklets();
+      updatePomoDisplay();
+    };
+  </script>
+</body>
+</html>
