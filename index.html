@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AceStudycore | Study Engine</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --accent-color: #8ab4f8;
+      --text-color: #e8eaed;
+      --subtext: #9aa0a6;
+      --border-color: #3c4043;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      --app-radius: 8px;
+      --app-font: system-ui, -apple-system, sans-serif;
+    }
+    body.theme-light {
+      --bg-color: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-color: #1a202c;
+      --subtext: #64748b;
+      --border-color: #e2e8f0;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--app-font); }
+    body { background-color: var(--bg-color); color: var(--text-color); padding: clamp(10px, 2vw, 20px); min-height: 100vh; transition: background-color 0.3s, color 0.3s; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+    .brand { font-size: clamp(20px, 3vw, 26px); font-weight: bold; color: var(--accent-color); transition: color 0.3s; }
+    .header-info { display: flex; gap: 12px; align-items: center; font-size: 14px; flex-wrap: wrap; }
+    .theme-select { padding: 6px 12px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: var(--app-radius); cursor: pointer; }
+
+    nav { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; }
+    nav button { padding: 8px 16px; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: var(--app-radius); cursor: pointer; white-space: nowrap; transition: all 0.2s; touch-action: manipulation; }
+    nav button.active { background: var(--accent-color); color: #000; font-weight: bold; border-color: var(--accent-color); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--app-radius); padding: clamp(12px, 2vw, 20px); margin-bottom: 16px; width: 100%; box-sizing: border-box; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+
+    .class-banner { background: var(--card-bg); border: 1px solid var(--accent-color); border-left: 6px solid var(--accent-color); border-radius: var(--app-radius); padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .class-tag { font-size: 11px; text-transform: uppercase; font-weight: bold; color: var(--accent-color); letter-spacing: 0.5px; }
+    .class-title { font-size: 16px; font-weight: bold; margin-top: 2px; }
+
+    .events-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 8px 0; -webkit-overflow-scrolling: touch; }
+    .event-card { background: var(--bg-color); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--app-radius); min-width: 220px; flex-shrink: 0; position: relative; }
+    .event-progress-bar { width: 100%; height: 6px; background: var(--border-color); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .event-progress-fill { height: 100%; background: var(--accent-color); transition: width 0.3s; }
+
+    .big-counter { font-size: clamp(32px, 5vw, 48px); font-weight: bold; color: var(--accent-color); text-align: center; margin: 8px 0; }
+
+    .subject-card { border: 1px solid var(--border-color); border-radius: var(--app-radius); padding: 12px; background: var(--bg-color); display: flex; flex-direction: column; position: relative; }
+    .subject-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+    .subject-title { font-weight: bold; font-size: 15px; }
+
+    .dots-btn { background: none; border: none; color: var(--text-color); cursor: pointer; font-size: 18px; font-weight: bold; padding: 4px; line-height: 1; touch-action: manipulation; }
+    .dots-btn:hover { color: var(--accent-color); }
+
+    .chap-list { list-style: none; font-size: 14px; max-height: 180px; overflow-y: auto; flex: 1; }
+    .chap-list li { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 6px; padding-right: 4px; }
+    .chap-left { display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; }
+    .btn-del-sm { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 16px; font-weight: bold; padding: 2px 6px; touch-action: manipulation; }
+
+    .pie-container { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+    .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
+    .table-container table { margin-top: 0; }
+    th, td { border: 1px solid var(--border-color); padding: 8px 12px; text-align: left; }
+    th { background: var(--bg-color); }
+    input, select, button.btn { padding: 8px 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); outline: none; touch-action: manipulation; }
+    button.btn { cursor: pointer; transition: opacity 0.2s; }
+    button.btn:hover { opacity: 0.85; }
+    button.btn-primary { background: var(--accent-color); color: #000; font-weight: bold; border: none; }
+
+    .input-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+    /* Modal Popup Styling */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 1200; align-items: center; justify-content: center; padding: 16px; }
+    .modal-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--app-radius); padding: 20px; width: 90%; max-width: 440px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; }
+    .modal-box input[type="text"], .modal-box input[type="date"], .modal-box input[type="number"], .modal-box select { width: 100% !important; max-width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; display: block; height: 38px; }
+    .modal-title { font-size: 18px; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+    .legend-container { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; justify-content: center; }
+
+    /* Badge styles for Grade circles (Updated thresholds: >=70% success, 50-69% warning, <50% danger) */
+    .badge { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; font-size: 12px; }
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+    .badge-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+    .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+
+    .subj-group-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: var(--app-radius); padding: 12px; margin-bottom: 12px; }
+    .subj-group-title { font-size: 16px; font-weight: bold; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+    
+    .page-cnt-btn { width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="brand">AceStudycore</div>
+      <div id="header-date" style="font-size: 13px; color: var(--subtext); font-weight: 500;"></div>
+    </div>
+    <div class="header-info">
+      <button class="btn btn-primary" onclick="openColorCustomizerModal()" style="font-size:12px; padding:6px 12px;">🎨 Colour Customization</button>
+      <select class="theme-select" id="theme-dropdown" onchange="changeTheme(this.value)">
+        <option value="dark">Dark Theme</option>
+        <option value="light">Light Theme</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Scheduled Banner -->
+  <div class="class-banner">
+    <div>
+      <div class="class-tag">Scheduled Today</div>
+      <div class="class-title" id="banner-class-title">Detecting today's schedule...</div>
+      <div id="banner-recurrence-type" style="font-size: 11px; color: var(--subtext); margin-top: 2px;">Recurrence: Daily Event</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div id="banner-class-time" style="font-weight: bold; font-family: monospace; font-size: 14px; color: var(--accent-color);">09:00 AM – 05:00 PM</div>
+      <button class="btn btn-primary" onclick="openScheduleModal()" style="font-size:12px; padding:6px 10px;">📅 Manage Schedule</button>
+    </div>
+  </div>
+
+  <nav>
+    <button class="active" onclick="switchTab('progress-pie', this)">Progress Pie</button>
+    <button onclick="switchTab('grade-tracker', this)">Grade Tracker</button>
+    <button onclick="switchTab('homework', this)">Homework</button>
+    <button onclick="switchTab('clipboard', this)">Clipboard</button>
+    <button onclick="switchTab('ppq', this)">Past Paper Log</button>
+    <button onclick="switchTab('ppq-booklets', this)">PPQ Booklets</button>
+    <button onclick="switchTab('pomodoro', this)">Pomodoro</button>
+  </nav>
+
+  <!-- TAB 1: PROGRESS PIE -->
+  <div id="progress-pie" class="tab-content active">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+        <div>
+          <h3>Upcoming Events & Timeline Progress</h3>
+          <div style="font-size:12px; color:var(--subtext); margin-top:2px;">Select an event to view and manage its specific syllabus, target dates, and revision speed.</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <label style="font-size:12px; font-weight:bold;">Active Target Event:</label>
+          <select id="active-event-selector" onchange="switchActiveEvent(this.value)" style="padding:6px 12px; font-weight:bold; background:var(--bg-color); color:var(--accent-color); border:1px solid var(--accent-color);"></select>
+          <button class="btn btn-primary" onclick="toggleAddEventForm()">+ Add Timeline Event</button>
+        </div>
+      </div>
+
+      <div id="event-form" class="input-group" style="display:none; background: var(--bg-color); padding: 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); margin-bottom: 12px;">
+        <input type="text" id="evt-name" placeholder="Event Name (e.g., JEE Main 2026)" style="flex:1; min-width:160px;">
+        <div><label style="font-size:11px; display:block; color:var(--subtext);">Start Date</label><input type="date" id="evt-start"></div>
+        <div><label style="font-size:11px; display:block; color:var(--subtext);">Finish Date</label><input type="date" id="evt-end"></div>
+        <div style="display:flex; align-items:flex-end;"><button class="btn btn-primary" onclick="saveEvent()">Save Event</button></div>
+      </div>
+
+      <div class="events-scroll" id="events-list"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Days Till Target (<span id="active-event-name-display" style="color:var(--accent-color);">--</span>)</h3>
+        <div class="big-counter" id="nearest-exam-days">--</div>
+        <div id="nearest-exam-title" style="text-align:center; color: var(--subtext);">No Event Selected</div>
+      </div>
+      <div class="card">
+        <h3>Revision Speed Calculator</h3>
+        <div style="margin-top: 10px; line-height: 1.8;">
+          <div>Total Number of Chapters: <strong id="calc-total">0</strong></div>
+          <div>Overall Completion: <strong id="calc-completion">0%</strong></div>
+          <div>Chapters Covered: <strong id="calc-covered">0</strong></div>
+          <div>Chapters Left: <strong id="calc-left">0</strong></div>
+          <div>Required Pace: <strong id="calc-pace">0</strong> chapters/day</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pie-container" style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">
+        <svg width="140" height="140" viewBox="0 0 36 36">
+          <circle r="15.9155" cx="18" cy="18" fill="none" stroke="#3c4043" stroke-width="3.8"/>
+          <circle id="pie-slice" r="15.9155" cx="18" cy="18" fill="none" stroke="var(--accent-color)" stroke-width="3.8" stroke-dasharray="0 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"/>
+        </svg>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3>Syllabus Breakdown for <span id="event-subhead-name" style="color:var(--accent-color);">--</span></h3>
+        <button class="btn btn-primary" onclick="promptAddSubject()">+ Add Subject</button>
+      </div>
+
+      <div class="grid-2" id="subject-cards"></div>
+    </div>
+  </div>
+
+  <!-- SUBJECT MENU SETTINGS MODAL -->
+  <div id="subject-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>Subject Settings</span>
+        <button class="btn-del-sm" onclick="closeSubjectModal()">&times;</button>
+      </div>
+      <input type="hidden" id="modal-orig-subject">
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Rename :</label>
+        <input type="text" id="modal-rename-input">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Hex code (Colour) :</label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="color" id="modal-color-picker" style="width:36px; height:36px; border:none; background:none; cursor:pointer;" onchange="document.getElementById('modal-hex-input').value = this.value">
+          <input type="text" id="modal-hex-input" style="flex:1;" placeholder="#8ab4f8">
+        </div>
+      </div>
+      <div style="margin-bottom:20px;">
+        <button class="btn" style="width:100%; border-color:var(--danger); color:var(--danger);" onclick="modalDeleteSubject()">Delete subject</button>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn" onclick="closeSubjectModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSubjectModalChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD SUBJECT MODAL -->
+  <div id="add-subject-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>Add Subject</span>
+        <button type="button" class="btn-del-sm" onclick="closeAddSubjectModal()">&times;</button>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Name :</label>
+        <input type="text" id="add-sub-name-input" placeholder="e.g. Physics">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Hex code :</label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="color" id="add-sub-color-picker" value="#8ab4f8" style="width:36px; height:36px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('add-sub-hex-input', 'add-sub-badge', this.value)">
+          <div id="add-sub-badge" style="width:20px; height:20px; border-radius:4px; border:1px solid var(--border-color); background:#8ab4f8;"></div>
+          <input type="text" id="add-sub-hex-input" style="flex:1;" value="#8ab4f8" placeholder="#8ab4f8" oninput="updateColorFromInput(this, 'add-sub-color-picker', 'add-sub-badge')">
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" class="btn" onclick="closeAddSubjectModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewSubject()">Add Subject</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEDICATED COLOUR CUSTOMIZATION MODAL -->
+  <div id="customizer-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-title">
+        <span>Colour Customization</span>
+        <button class="btn-del-sm" onclick="closeColorCustomizerModal()">&times;</button>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:16px; max-height: 70vh; overflow-y: auto; padding-right: 6px;">
+        <!-- Detailed Global Interface Dials -->
+        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+          <h4 style="font-size: 14px; margin-bottom: 10px; color: var(--accent-color);">Global App Canvas Palette</h4>
+          
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <label style="font-size:12px;">Background:</label>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <input type="color" id="cust-bg-picker" style="width:28px; height:28px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('cust-bg-hex', 'cust-bg-badge', this.value)">
+                <div id="cust-bg-badge" style="width:16px; height:16px; border-radius:4px; border:1px solid var(--border-color); background:#121212;"></div>
+                <input type="text" id="cust-bg-hex" placeholder="#121212" style="width:70px; font-size:11px;" oninput="updateColorFromInput(this, 'cust-bg-picker', 'cust-bg-badge')">
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <label style="font-size:12px;">Card Background:</label>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <input type="color" id="cust-cardbg-picker" style="width:28px; height:28px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('cust-cardbg-hex', 'cust-cardbg-badge', this.value)">
+                <div id="cust-cardbg-badge" style="width:16px; height:16px; border-radius:4px; border:1px solid var(--border-color); background:#1e1e1e;"></div>
+                <input type="text" id="cust-cardbg-hex" placeholder="#1e1e1e" style="width:70px; font-size:11px;" oninput="updateColorFromInput(this, 'cust-cardbg-picker', 'cust-cardbg-badge')">
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <label style="font-size:12px;">Main Text:</label>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <input type="color" id="cust-text-picker" style="width:28px; height:28px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('cust-text-hex', 'cust-text-badge', this.value)">
+                <div id="cust-text-badge" style="width:16px; height:16px; border-radius:4px; border:1px solid var(--border-color); background:#e8eaed;"></div>
+                <input type="text" id="cust-text-hex" placeholder="#e8eaed" style="width:70px; font-size:11px;" oninput="updateColorFromInput(this, 'cust-text-picker', 'cust-text-badge')">
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <label style="font-size:12px;">Subtext / Labels:</label>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <input type="color" id="cust-subtext-picker" style="width:28px; height:28px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('cust-subtext-hex', 'cust-subtext-badge', this.value)">
+                <div id="cust-subtext-badge" style="width:16px; height:16px; border-radius:4px; border:1px solid var(--border-color); background:#9aa0a6;"></div>
+                <input type="text" id="cust-subtext-hex" placeholder="#9aa0a6" style="width:70px; font-size:11px;" oninput="updateColorFromInput(this, 'cust-subtext-picker', 'cust-subtext-badge')">
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <label style="font-size:12px;">Accent Highlight:</label>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <input type="color" id="cust-accent-picker" style="width:28px; height:28px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('cust-accent-hex', 'cust-accent-badge', this.value)">
+                <div id="cust-accent-badge" style="width:16px; height:16px; border-radius:4px; border:1px solid var(--border-color); background:#8ab4f8;"></div>
+                <input type="text" id="cust-accent-hex" placeholder="#8ab4f8" style="width:70px; font-size:11px;" oninput="updateColorFromInput(this, 'cust-accent-picker', 'cust-accent-badge')">
+              </div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <label style="font-size:12px;">Borders / Lines:</label>
+              <div style="display:flex; gap:4px; align-items:center;">
+                <input type="color" id="cust-border-picker" style="width:28px; height:28px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('cust-border-hex', 'cust-border-badge', this.value)">
+                <div id="cust-border-badge" style="width:16px; height:16px; border-radius:4px; border:1px solid var(--border-color); background:#3c4043;"></div>
+                <input type="text" id="cust-border-hex" placeholder="#3c4043" style="width:70px; font-size:11px;" oninput="updateColorFromInput(this, 'cust-border-picker', 'cust-border-badge')">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Matrix section -->
+        <div>
+          <h4 style="font-size: 14px; margin-bottom: 4px; color: var(--accent-color);">Subject Colour Matrix</h4>
+          <p style="font-size:11px; color:var(--subtext); margin-bottom:12px;">Wherever a subject is used in data or graphs, it will adopt this specific hex code.</p>
+          
+          <div id="subject-color-rows" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+        <button class="btn" onclick="closeColorCustomizerModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveAllColorCustomizations()">Save & Apply Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: GRADE TRACKER -->
+  <div id="grade-tracker" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <h3>Grade & Score Trend Line Graph</h3>
+      </div>
+
+      <!-- Cleaned up height and spacing container for Graph -->
+      <div style="width:100%; min-height:340px; height:360px; position:relative; background:var(--bg-color); border-radius:var(--app-radius); border:1px solid var(--border-color); padding:16px;">
+        <canvas id="gradeTrendCanvas" style="width:100%; height:100%; display:block;"></canvas>
+      </div>
+
+      <div class="legend-container" id="graph-legend"></div>
+    </div>
+
+    <!-- Logged Component Scores Table -->
+    <div class="card">
+      <h3>Logged Component Scores</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Exam / Component</th>
+              <th>Score</th>
+              <th>Percentage</th>
+              <th>Grade</th>
+              <th style="width:70px; text-align:center;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="grade-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="input-group">
+        <input type="text" id="gt-sub" placeholder="Subject (e.g. Physics)" style="flex:1;">
+        <input type="text" id="gt-comp" placeholder="Exam Name (e.g. UT, HY, P1)" style="flex:1;">
+        <input type="number" id="gt-score" placeholder="Score Obtained" style="width:120px;">
+        <input type="number" id="gt-total" placeholder="Max Score" style="width:100px;">
+        <button class="btn btn-primary" onclick="addGrade()">Add Score</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MANAGE SCHEDULE & CALENDAR EVENT SUITE MODAL -->
+  <div id="schedule-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-title">
+        <span>Calendar Event Suite</span>
+        <button class="btn-del-sm" onclick="closeScheduleModal()">&times;</button>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
+        <div>
+          <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Schedule Title:</label>
+          <input type="text" id="sch-title-input" placeholder="e.g. Classes & Study Schedule Active">
+        </div>
+
+        <div>
+          <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Event Recurrence Type:</label>
+          <select id="sch-recurrence-input">
+            <option value="daily">Daily Event</option>
+            <option value="weekly">Weekly Event</option>
+            <option value="monthly">Monthly Event</option>
+            <option value="yearly">Yearly Event</option>
+            <option value="standalone">Standalone Event</option>
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div>
+            <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Start Time:</label>
+            <input type="text" id="sch-start-time" placeholder="09:00 AM">
+          </div>
+          <div>
+            <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">End Time:</label>
+            <input type="text" id="sch-end-time" placeholder="05:00 PM">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn" onclick="closeScheduleModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveScheduleSettings()">Update Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: HOMEWORK -->
+  <div id="homework" class="tab-content">
+    <div class="card">
+      <h3>Homework & Assignments</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th style="width:60px; text-align:center;">Done</th><th style="width:20%;">Subject</th><th>Task Description</th><th style="width:140px;">Due Date</th></tr>
+          </thead>
+          <tbody id="hw-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="input-group">
+        <input type="text" id="hw-sub" placeholder="Subject" style="flex:1;">
+        <input type="text" id="hw-task" placeholder="Task details" style="flex:2;">
+        <input type="date" id="hw-date">
+        <button class="btn btn-primary" onclick="addHW()">Add Homework</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: CLIPBOARD -->
+  <div id="clipboard" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3>Clipboard Management</h3>
+        <button class="btn btn-primary" onclick="openNewClipboardModal()">+ New Clipboard</button>
+      </div>
+      <div class="grid-2" id="clipboard-container"></div>
+    </div>
+  </div>
+
+  <!-- NEW CLIPBOARD MODAL -->
+  <div id="new-clipboard-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>New Clipboard</span>
+        <button class="btn-del-sm" onclick="closeNewClipboardModal()">&times;</button>
+      </div>
+      <div style="margin-bottom:12px; width: 100%;">
+        <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Clip board name :</label>
+        <input type="text" id="cb-name-input" placeholder="e.g. Physics Revision List">
+      </div>
+      <div style="margin-bottom:20px; width: 100%;">
+        <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Completion date :</label>
+        <input type="date" id="cb-date-input">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn" onclick="closeNewClipboardModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewClipboard()">Create Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD CLIPBOARD TASK MODAL -->
+  <div id="add-task-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>Add Task</span>
+        <button class="btn-del-sm" onclick="closeAddTaskModal()">&times;</button>
+      </div>
+      <input type="hidden" id="task-modal-cb-id">
+      <div style="margin-bottom:20px; width: 100%;">
+        <label style="font-size:12px; color:var(--subtext); display:block; margin-bottom:4px;">Task name :</label>
+        <input type="text" id="task-name-input" placeholder="e.g. Solve past paper 2022">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn" onclick="closeAddTaskModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewTask()">Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: PAST PAPER LOG -->
+  <div id="ppq" class="tab-content">
+    <div class="card">
+      <h3>Past Paper Question (PPQ) Log</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Subject</th><th>Past Paper Code</th><th>Score %</th><th>Date</th><th style="width:70px; text-align:center;">Action</th></tr>
+          </thead>
+          <tbody id="ppq-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="input-group">
+        <input type="text" id="ppq-sub" placeholder="Subject (e.g. Physics)" style="flex:1;">
+        <input type="text" id="ppq-paper-code" placeholder="Past Paper Code (e.g. 9702/22/M/J/23)" style="flex:1;">
+        <input type="number" id="ppq-score" placeholder="Score %" style="width:100px;">
+        <input type="date" id="ppq-date">
+        <button class="btn btn-primary" onclick="addPPQ()">Log Paper</button>
+      </div>
+    </div>
+
+    <!-- Overall Score Table grouped by Subject + Code -->
+    <div class="card">
+      <h3 style="margin-bottom:8px;">Overall Score Summary (Grouped by Subject + Code)</h3>
+      <p style="font-size:12px; color:var(--subtext); margin-bottom:12px;">Calculates the average score and letter grade of all papers of the same subject and component code (e.g. Physics 22).</p>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr><th>Subject + Code</th><th>Score</th><th>%</th><th>Letter Grade</th></tr>
+          </thead>
+          <tbody id="ppq-summary-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Papers Completed Counters -->
+    <div class="grid-2">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:13px; color:var(--subtext);">Papers completed before <span id="upcoming-exam-label" style="font-weight:bold; color:var(--accent-color);">Prelims 1</span></div>
+        <div class="big-counter" id="papers-before-exam-count">0</div>
+        <div style="font-size:12px; color:var(--subtext);">Adjusts based on the most upcoming exam</div>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:13px; color:var(--subtext);">Total amount of papers completed</div>
+        <div class="big-counter" id="papers-total-count">0</div>
+        <div style="font-size:12px; color:var(--subtext);">Total papers logged</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: PPQ BOOKLETS -->
+  <div id="ppq-booklets" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+        <h3>PPQ Booklet Tracker (Sorted by Subject)</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" onclick="toggleWorkbookForm()">+ Workbook</button>
+          <button class="btn btn-primary" onclick="toggleTopicalForm()">+ Topical</button>
+        </div>
+      </div>
+
+      <div id="workbook-form" class="input-group" style="display:none; background: var(--bg-color); padding: 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); margin-bottom: 12px;">
+        <h4 style="width:100%; font-size:13px; color:var(--accent-color);">+ Add Workbook Entry</h4>
+        <input type="text" id="wb-sub" placeholder="Subject (e.g. Math)" style="width:130px;">
+        <input type="text" id="wb-chap" placeholder="Chapter / Details" style="flex:1;">
+        <input type="number" id="wb-done" placeholder="pages done" style="width:120px;">
+        <input type="number" id="wb-total" placeholder="Total Pages" style="width:120px;">
+        <button class="btn btn-primary" onclick="addWorkbookItem()">Add Workbook</button>
+      </div>
+
+      <div id="topical-form" class="input-group" style="display:none; background: var(--bg-color); padding: 12px; border-radius: var(--app-radius); border: 1px solid var(--border-color); margin-bottom: 12px;">
+        <h4 style="width:100%; font-size:13px; color:var(--accent-color);">+ Add Topical Entry</h4>
+        <input type="text" id="top-sub" placeholder="Subject (e.g. Physics)" style="width:130px;">
+        <input type="text" id="top-topic" placeholder="Topic details" style="flex:1;">
+        <input type="number" id="top-done" placeholder="pages done" style="width:120px;">
+        <input type="number" id="top-total" placeholder="Total Pages" style="width:120px;">
+        <button class="btn btn-primary" onclick="addTopicalItem()">Add Topical</button>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h4 style="font-size:18px; margin-bottom:12px;">Workbook</h4>
+          <div id="workbook-subject-container"></div>
+        </div>
+
+        <div>
+          <h4 style="font-size:18px; margin-bottom:12px;">Topical</h4>
+          <div id="topical-subject-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: POMODORO -->
+  <div id="pomodoro" class="tab-content">
+    <div class="card" style="text-align:center; max-width: 500px; margin: 0 auto;">
+      <h3>Adjustable Focus Timer</h3>
+      
+      <div class="input-group" style="justify-content:center; margin-bottom:16px;">
+        <div>
+          <label style="font-size:11px; color:var(--subtext);">Focus Time (Mins)</label>
+          <input type="number" id="pomo-input-min" value="25" min="1" max="180" style="width:90px; text-align:center;">
+        </div>
+        <div style="display:flex; align-items:flex-end;">
+          <button class="btn btn-primary" onclick="applyCustomPomo()">Set Timer</button>
+        </div>
+      </div>
+
+      <div class="big-counter" id="pomo-display" style="font-size:64px;">25:00</div>
+
+      <div style="margin-top: 16px; display:flex; gap:12px; justify-content:center;">
+        <button class="btn btn-primary" style="padding: 10px 24px;" onclick="startPomo()" id="pomo-start-btn">Start</button>
+        <button class="btn" style="padding: 10px 24px;" onclick="pausePomo()" id="pomo-pause-btn">Pause</button>
+        <button class="btn" style="padding: 10px 24px;" onclick="resetPomo()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEFAULT_AS_DATA = {
+      "Physics": ["Physical Quantities & Units", "Kinematics", "Dynamics", "Forces, Density & Pressure", "Work, Energy & Power"],
+      "Chemistry": ["Atomic Structure", "Chemical Bonding", "States of Matter", "Chemical Energetics"],
+      "Biology": ["Cell Structure", "Biological Molecules", "Enzymes", "Cell Membranes & Transport"],
+      "Math": ["Quadratics", "Functions", "Coordinate Geometry", "Circular Measure", "Trigonometry"]
+    };
+
+    const DEFAULT_COLORS = {
+      'biology': '#34d399',
+      'physics': '#a78bfa',
+      'chemistry': '#60a5fa',
+      'math': '#f87171'
+    };
+
+    let events = JSON.parse(localStorage.getItem('ace_events_v2')) || [
+      { id: 'evt-1', name: 'Prelims 1', start: '2026-10-01', end: '2026-11-30' },
+      { id: 'evt-2', name: 'JEE Main', start: '2026-10-01', end: '2027-01-24' }
+    ];
+
+    let activeEventId = localStorage.getItem('ace_active_evt_id') || (events[0] ? events[0].id : '');
+
+    let eventSyllabusMap = JSON.parse(localStorage.getItem('ace_event_syllabi')) || {};
+    let checkedChaps = JSON.parse(localStorage.getItem('ace_checked')) || {};
+    let customSubjectColors = JSON.parse(localStorage.getItem('ace_custom_colors')) || { ...DEFAULT_COLORS };
+    
+    function getActiveSyllabus() {
+      if (!activeEventId) return {};
+      if (!eventSyllabusMap[activeEventId]) {
+        eventSyllabusMap[activeEventId] = JSON.parse(JSON.stringify(DEFAULT_AS_DATA));
+      }
+      return eventSyllabusMap[activeEventId];
+    }
+
+    let currentBaseTheme = localStorage.getItem('ace_base_theme') || 'dark';
+    let currentAppAccent = localStorage.getItem('ace_app_accent') || '#8ab4f8';
+
+    let gradesList = JSON.parse(localStorage.getItem('ace_grades')) || [
+      { subject: 'Chemistry', component: 'UT', score: 25, total: 50, pct: 50, grade: 'D' },
+      { subject: 'Chemistry', component: 'HY', score: 38, total: 50, pct: 76, grade: 'B' },
+      { subject: 'Chemistry', component: 'P1', score: 44, total: 50, pct: 88, grade: 'A' },
+      { subject: 'Stats', component: 'UT', score: 36, total: 50, pct: 72, grade: 'B' },
+      { subject: 'Stats', component: 'HY', score: 29, total: 50, pct: 58, grade: 'C' },
+      { subject: 'Stats', component: 'P1', score: 49, total: 50, pct: 98, grade: 'A' }
+    ];
+    let hwList = JSON.parse(localStorage.getItem('ace_hw')) || [];
+    let ppqList = JSON.parse(localStorage.getItem('ace_ppq')) || [
+      { sub: 'Physics', paperCode: '9702/22/M/J/23', score: '80', date: '2026-12-12' },
+      { sub: 'Physics', paperCode: '9702/22/O/N/23', score: '70', date: '2026-12-13' }
+    ];
+    let workbookList = JSON.parse(localStorage.getItem('ace_workbook')) || [
+      { sub: 'Math', chap: 'Chap 1', done: 67, total: 100 },
+      { sub: 'Math', chap: 'Chap 2', done: 200, total: 200 },
+      { sub: 'Bio', chap: 'Chap 1', done: 80, total: 80 }
+    ];
+    let topicalList = JSON.parse(localStorage.getItem('ace_topical')) || [
+      { sub: 'Physics', topic: 'Waves', done: 67, total: 70 },
+      { sub: 'Chem', topic: 'Energetics', done: 40, total: 50 }
+    ];
+    let clipboardList = JSON.parse(localStorage.getItem('ace_clipboards')) || [
+      { id: 'cb-1', name: 'Physics Unit 1', date: '2026-11-15', tasks: [{ id: 't1', text: 'Solve past paper 2022', done: false }, { id: 't2', text: 'Review formula sheet', done: true }] }
+    ];
+
+    function getSubjectColor(subName) {
+      if (!subName) return '#8ab4f8';
+      let key = subName.toLowerCase().trim();
+      if (customSubjectColors[key]) return customSubjectColors[key];
+      return '#8ab4f8';
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+      if (tabId === 'grade-tracker') renderGradeGraph();
+    }
+
+    function switchActiveEvent(evtId) {
+      activeEventId = evtId;
+      localStorage.setItem('ace_active_evt_id', evtId);
+      renderEvents();
+      renderSubjects();
+    }
+
+    function changeTheme(themeName) {
+      currentBaseTheme = themeName;
+      localStorage.setItem('ace_base_theme', themeName);
+      document.body.className = themeName === 'dark' ? '' : `theme-${themeName}`;
+    }
+
+    function applyCustomAppAccent(hexColor) {
+      currentAppAccent = hexColor;
+      document.documentElement.style.setProperty('--accent-color', hexColor);
+      localStorage.setItem('ace_app_accent', hexColor);
+    }
+
+    function openSubjectModal(subName) {
+      document.getElementById('modal-orig-subject').value = subName;
+      document.getElementById('modal-rename-input').value = subName;
+      let curColor = getSubjectColor(subName);
+      document.getElementById('modal-color-picker').value = curColor;
+      document.getElementById('modal-hex-input').value = curColor;
+      document.getElementById('subject-modal').style.display = 'flex';
+    }
+
+    function closeSubjectModal() {
+      document.getElementById('subject-modal').style.display = 'none';
+    }
+
+    function promptAddSubject() {
+      document.getElementById('add-sub-name-input').value = '';
+      document.getElementById('add-sub-hex-input').value = '#8ab4f8';
+      document.getElementById('add-sub-color-picker').value = '#8ab4f8';
+      document.getElementById('add-sub-badge').style.backgroundColor = '#8ab4f8';
+      document.getElementById('add-subject-modal').style.display = 'flex';
+    }
+
+    function closeAddSubjectModal() {
+      document.getElementById('add-subject-modal').style.display = 'none';
+    }
+
+    function saveNewSubject() {
+      const subName = document.getElementById('add-sub-name-input').value.trim();
+      const hexCode = document.getElementById('add-sub-hex-input').value.trim() || '#8ab4f8';
+
+      if (!subName) return;
+
+      // Ensure activeEventId exists even if local storage on laptop was empty
+      if (!activeEventId || !events.some(e => e.id === activeEventId)) {
+        if (events.length === 0) {
+          const defaultEvt = { id: 'evt-' + Date.now(), name: 'Main Term 2026', start: '2026-10-01', end: '2026-12-31' };
+          events.push(defaultEvt);
+        }
+        activeEventId = events[0].id;
+        localStorage.setItem('ace_events_v2', JSON.stringify(events));
+        localStorage.setItem('ace_active_evt_id', activeEventId);
+      }
+
+      let currentSyllabus = getActiveSyllabus();
+
+      if (currentSyllabus[subName]) {
+        alert("Subject already exists in this event!");
+        return;
+      }
+
+      currentSyllabus[subName] = [];
+      customSubjectColors[subName.toLowerCase()] = hexCode;
+
+      localStorage.setItem('ace_event_syllabi', JSON.stringify(eventSyllabusMap));
+      localStorage.setItem('ace_custom_colors', JSON.stringify(customSubjectColors));
+
+      closeAddSubjectModal();
+      renderEvents();
+      renderSubjects();
+      renderGrades();
+      renderBooklets();
+    }
+
+    function modalDeleteSubject() {
+      const orig = document.getElementById('modal-orig-subject').value;
+      let currentSyllabus = getActiveSyllabus();
+      if (!orig || !currentSyllabus[orig]) return;
+
+      delete currentSyllabus[orig];
+
+      for (let key in checkedChaps) {
+        if (key.startsWith(`${activeEventId}-${orig}-`)) {
+          delete checkedChaps[key];
+        }
+      }
+
+      localStorage.setItem('ace_event_syllabi', JSON.stringify(eventSyllabusMap));
+      localStorage.setItem('ace_checked', JSON.stringify(checkedChaps));
+
+      closeSubjectModal();
+      renderSubjects();
+      renderGrades();
+      renderPPQ();
+      renderBooklets();
+    }
+
+    function saveSubjectModalChanges() {
+      let orig = document.getElementById('modal-orig-subject').value;
+      let newName = document.getElementById('modal-rename-input').value.trim();
+      let newHex = document.getElementById('modal-hex-input').value.trim();
+      let currentSyllabus = getActiveSyllabus();
+
+      if (!newName || !orig || !currentSyllabus[orig]) return;
+
+      if (newName !== orig) {
+        currentSyllabus[newName] = currentSyllabus[orig];
+        delete currentSyllabus[orig];
+
+        for (let key in checkedChaps) {
+          if (key.startsWith(`${activeEventId}-${orig}-`)) {
+            let chapName = key.substring(`${activeEventId}-${orig}-`.length);
+            checkedChaps[`${activeEventId}-${newName}-${chapName}`] = checkedChaps[key];
+            delete checkedChaps[key];
+          }
+        }
+      }
+
+      if (newHex) {
+        customSubjectColors[newName.toLowerCase()] = newHex;
+        localStorage.setItem('ace_custom_colors', JSON.stringify(customSubjectColors));
+      }
+
+      localStorage.setItem('ace_event_syllabi', JSON.stringify(eventSyllabusMap));
+      localStorage.setItem('ace_checked', JSON.stringify(checkedChaps));
+
+      closeSubjectModal();
+      renderSubjects();
+      renderGrades();
+      renderBooklets();
+    }
+
+    function openColorCustomizerModal() {
+      let bodyStyles = getComputedStyle(document.body);
+
+      let bgVal = bodyStyles.getPropertyValue('--bg-color').trim() || '#121212';
+      document.getElementById('cust-bg-hex').value = bgVal;
+      document.getElementById('cust-bg-picker').value = bgVal;
+      document.getElementById('cust-bg-badge').style.backgroundColor = bgVal;
+
+      let cardBgVal = bodyStyles.getPropertyValue('--card-bg').trim() || '#1e1e1e';
+      document.getElementById('cust-cardbg-hex').value = cardBgVal;
+      document.getElementById('cust-cardbg-picker').value = cardBgVal;
+      document.getElementById('cust-cardbg-badge').style.backgroundColor = cardBgVal;
+
+      let textVal = bodyStyles.getPropertyValue('--text-color').trim() || '#e8eaed';
+      document.getElementById('cust-text-hex').value = textVal;
+      document.getElementById('cust-text-picker').value = textVal;
+      document.getElementById('cust-text-badge').style.backgroundColor = textVal;
+
+      let subtextVal = bodyStyles.getPropertyValue('--subtext').trim() || '#9aa0a6';
+      document.getElementById('cust-subtext-hex').value = subtextVal;
+      document.getElementById('cust-subtext-picker').value = subtextVal;
+      document.getElementById('cust-subtext-badge').style.backgroundColor = subtextVal;
+
+      let accentVal = currentAppAccent || '#8ab4f8';
+      document.getElementById('cust-accent-hex').value = accentVal;
+      document.getElementById('cust-accent-picker').value = accentVal;
+      document.getElementById('cust-accent-badge').style.backgroundColor = accentVal;
+
+      let borderVal = bodyStyles.getPropertyValue('--border-color').trim() || '#3c4043';
+      document.getElementById('cust-border-hex').value = borderVal;
+      document.getElementById('cust-border-picker').value = borderVal;
+      document.getElementById('cust-border-badge').style.backgroundColor = borderVal;
+
+      const rowsContainer = document.getElementById('subject-color-rows');
+      rowsContainer.innerHTML = '';
+
+      let allSubjectsSet = new Set();
+      for (let evtId in eventSyllabusMap) {
+        if (eventSyllabusMap[evtId]) {
+          Object.keys(eventSyllabusMap[evtId]).forEach(sub => allSubjectsSet.add(sub));
+        }
+      }
+      Object.keys(DEFAULT_AS_DATA).forEach(sub => allSubjectsSet.add(sub));
+
+      allSubjectsSet.forEach(sub => {
+        let curHex = getSubjectColor(sub);
+        let safeSub = sub.replace(/\s+/g,'_');
+        let row = document.createElement('div');
+        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between;';
+        row.innerHTML = `
+          <span style="font-size:13px; font-weight:bold;">${sub} :</span>
+          <div style="display:flex; gap:4px; align-items:center;">
+            <input type="color" value="${curHex}" id="cust-sub-picker-${safeSub}" style="width:28px; height:28px; border:none; background:none; cursor:pointer;" onchange="updateHexAndBadge('cust-sub-hex-${safeSub}', 'cust-sub-badge-${safeSub}', this.value)">
+            <div id="cust-sub-badge-${safeSub}" style="width:16px; height:16px; border-radius:4px; border:1px solid var(--border-color); background:${curHex};"></div>
+            <input type="text" class="sub-custom-hex-input" data-subject="${sub}" id="cust-sub-hex-${safeSub}" value="${curHex}" style="width:80px; font-size:12px;" oninput="updateColorFromInput(this, 'cust-sub-picker-${safeSub}', 'cust-sub-badge-${safeSub}')">
+          </div>
+        `;
+        rowsContainer.appendChild(row);
+      });
+
+      document.getElementById('customizer-modal').style.display = 'flex';
+    }
+
+    function closeColorCustomizerModal() {
+      document.getElementById('customizer-modal').style.display = 'none';
+    }
+
+    function updateHexAndBadge(hexInputId, badgeId, colorVal) {
+      document.getElementById(hexInputId).value = colorVal;
+      document.getElementById(badgeId).style.backgroundColor = colorVal;
+    }
+
+    function updateColorFromInput(inputElem, pickerId, badgeId) {
+      let val = inputElem.value;
+      if (/^#[0-9A-F]{6}$/i.test(val)) {
+        document.getElementById(pickerId).value = val;
+        document.getElementById(badgeId).style.backgroundColor = val;
+      }
+    }
+
+    function saveAllColorCustomizations() {
+      let bgVal = document.getElementById('cust-bg-hex').value;
+      let cardBgVal = document.getElementById('cust-cardbg-hex').value;
+      let textVal = document.getElementById('cust-text-hex').value;
+      let subtextVal = document.getElementById('cust-subtext-hex').value;
+      let accentVal = document.getElementById('cust-accent-hex').value;
+      let borderVal = document.getElementById('cust-border-hex').value;
+
+      document.documentElement.style.setProperty('--bg-color', bgVal);
+      document.documentElement.style.setProperty('--card-bg', cardBgVal);
+      document.documentElement.style.setProperty('--text-color', textVal);
+      document.documentElement.style.setProperty('--subtext', subtextVal);
+      document.documentElement.style.setProperty('--border-color', borderVal);
+
+      applyCustomAppAccent(accentVal);
+
+      document.querySelectorAll('.sub-custom-hex-input').forEach(input => {
+        let sub = input.getAttribute('data-subject');
+        let hex = input.value.trim();
+        if (sub && hex) {
+          customSubjectColors[sub.toLowerCase()] = hex;
+        }
+      });
+
+      localStorage.setItem('ace_custom_colors', JSON.stringify(customSubjectColors));
+
+      closeColorCustomizerModal();
+      renderSubjects();
+      renderGrades();
+      renderBooklets();
+    }
+
+    function toggleAddEventForm() {
+      const f = document.getElementById('event-form');
+      f.style.display = f.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function saveEvent() {
+      const name = document.getElementById('evt-name').value;
+      const start = document.getElementById('evt-start').value;
+      const end = document.getElementById('evt-end').value;
+
+      if (!name || !start || !end) {
+        alert("Please fill in event name, start date, and finish date.");
+        return;
+      }
+
+      const newEvt = { id: 'evt-' + Date.now(), name, start, end };
+      events.push(newEvt);
+      activeEventId = newEvt.id;
+      localStorage.setItem('ace_events_v2', JSON.stringify(events));
+      localStorage.setItem('ace_active_evt_id', activeEventId);
+
+      document.getElementById('evt-name').value = '';
+      document.getElementById('evt-start').value = '';
+      document.getElementById('evt-end').value = '';
+      toggleAddEventForm();
+      renderEvents();
+      renderSubjects();
+    }
+
+    function deleteEvent(id, e) {
+      e.stopPropagation();
+      events = events.filter(ev => ev.id !== id);
+      delete eventSyllabusMap[id];
+      if (activeEventId === id) {
+        activeEventId = events[0] ? events[0].id : '';
+      }
+      localStorage.setItem('ace_events_v2', JSON.stringify(events));
+      localStorage.setItem('ace_event_syllabi', JSON.stringify(eventSyllabusMap));
+      localStorage.setItem('ace_active_evt_id', activeEventId);
+      renderEvents();
+      renderSubjects();
+    }
+
+    function renderEvents() {
+      const container = document.getElementById('events-list');
+      const selector = document.getElementById('active-event-selector');
+      container.innerHTML = '';
+      selector.innerHTML = '';
+
+      if (events.length === 0) {
+        // Auto-create a default event if list is empty so subject adding works right away
+        const defaultEvt = { id: 'evt-' + Date.now(), name: 'Main Term 2026', start: '2026-10-01', end: '2026-12-31' };
+        events.push(defaultEvt);
+        activeEventId = defaultEvt.id;
+        localStorage.setItem('ace_events_v2', JSON.stringify(events));
+        localStorage.setItem('ace_active_evt_id', activeEventId);
+      }
+
+      if (!activeEventId || !events.some(e => e.id === activeEventId)) {
+        activeEventId = events[0].id;
+        localStorage.setItem('ace_active_evt_id', activeEventId);
+      }
+
+      const today = new Date();
+
+      events.forEach(evt => {
+        const opt = document.createElement('option');
+        opt.value = evt.id;
+        opt.innerText = evt.name;
+        if (evt.id === activeEventId) opt.selected = true;
+        selector.appendChild(opt);
+
+        const startDate = new Date(evt.start);
+        const endDate = new Date(evt.end);
+        const totalDuration = endDate - startDate;
+        const elapsed = today - startDate;
+        let pct = 0;
+        if (totalDuration > 0) {
+          pct = Math.min(Math.max(Math.round((elapsed / totalDuration) * 100), 0), 100);
+        }
+
+        const isSelected = evt.id === activeEventId;
+
+        const div = document.createElement('div');
+        div.className = 'event-card';
+        if (isSelected) div.style.borderColor = 'var(--accent-color)';
+        div.style.cursor = 'pointer';
+        div.onclick = () => switchActiveEvent(evt.id);
+
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>${evt.name}</strong>
+            <button class="btn-del-sm" onclick="deleteEvent('${evt.id}', event)">&times;</button>
+          </div>
+          <div style="font-size:11px; color:var(--subtext); margin-top:4px;">${evt.start} &rarr; ${evt.end}</div>
+          <div style="font-size:11px; margin-top:6px; font-weight:bold;">${pct}% Elapsed</div>
+          <div class="event-progress-bar">
+            <div class="event-progress-fill" style="width: ${pct}%;"></div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+
+      const activeEvt = events.find(e => e.id === activeEventId);
+      if (activeEvt) {
+        document.getElementById('active-event-name-display').innerText = activeEvt.name;
+        document.getElementById('event-subhead-name').innerText = activeEvt.name;
+        document.getElementById('upcoming-exam-label').innerText = activeEvt.name;
+
+        const targetDate = new Date(activeEvt.end);
+        const diffTime = targetDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const finalDays = diffDays >= 0 ? diffDays : 0;
+
+        document.getElementById('nearest-exam-days').innerText = finalDays;
+        document.getElementById('nearest-exam-title').innerText = activeEvt.name;
+      }
+    }
+
+    function addChapter(sub) {
+      let currentSyllabus = getActiveSyllabus();
+      const chapName = prompt(`Add chapter to ${sub}:`);
+      if (chapName && chapName.trim()) {
+        currentSyllabus[sub].push(chapName.trim());
+        localStorage.setItem('ace_event_syllabi', JSON.stringify(eventSyllabusMap));
+        renderSubjects();
+      }
+    }
+
+    function deleteChapter(sub, chapName) {
+      let currentSyllabus = getActiveSyllabus();
+      currentSyllabus[sub] = currentSyllabus[sub].filter(c => c !== chapName);
+      delete checkedChaps[`${activeEventId}-${sub}-${chapName}`];
+      localStorage.setItem('ace_event_syllabi', JSON.stringify(eventSyllabusMap));
+      localStorage.setItem('ace_checked', JSON.stringify(checkedChaps));
+      renderSubjects();
+    }
+
+    function toggleChap(sub, chapName, isChecked) {
+      checkedChaps[`${activeEventId}-${sub}-${chapName}`] = isChecked;
+      localStorage.setItem('ace_checked', JSON.stringify(checkedChaps));
+      renderSubjects();
+    }
+
+    function renderSubjects() {
+      let currentSyllabus = getActiveSyllabus();
+      const container = document.getElementById('subject-cards');
+      container.innerHTML = '';
+
+      let grandTotal = 0;
+      let grandCovered = 0;
+
+      for (let sub in currentSyllabus) {
+        const chapters = currentSyllabus[sub];
+        const subColor = getSubjectColor(sub);
+        
+        let doneCount = 0;
+        chapters.forEach(c => {
+          if (checkedChaps[`${activeEventId}-${sub}-${c}`]) doneCount++;
+        });
+
+        grandTotal += chapters.length;
+        grandCovered += doneCount;
+
+        const card = document.createElement('div');
+        card.className = 'subject-card';
+        card.style.borderTop = `4px solid ${subColor}`;
+
+        let chapHtml = '';
+        chapters.forEach(c => {
+          const isDone = !!checkedChaps[`${activeEventId}-${sub}-${c}`];
+          chapHtml += `
+            <li>
+              <div class="chap-left">
+                <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleChap('${sub}', '${c.replace(/'/g, "\\'")}', this.checked)">
+                <span style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${c}</span>
+              </div>
+              <button class="btn-del-sm" onclick="deleteChapter('${sub}', '${c.replace(/'/g, "\\'")}')">&times;</button>
+            </li>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="subject-header">
+            <div class="subject-title" style="color:${subColor};">${sub}</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="mini-pie-wrap">${doneCount}/${chapters.length} covered</span>
+              <button class="dots-btn" onclick="openSubjectModal('${sub.replace(/'/g, "\\'")}')">&#8942;</button>
+            </div>
+          </div>
+          <ul class="chap-list">
+            ${chapHtml}
+          </ul>
+          <div style="margin-top: 10px;">
+            <button class="btn" style="width:100%; font-size:12px; padding:4px;" onclick="addChapter('${sub.replace(/'/g, "\\'")}')">+ Add Chapter</button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+
+      const calcPct = grandTotal > 0 ? Math.round((grandCovered / grandTotal) * 100) : 0;
+      const left = grandTotal - grandCovered;
+
+      document.getElementById('calc-total').innerText = grandTotal;
+      document.getElementById('calc-completion').innerText = calcPct + '%';
+      document.getElementById('calc-covered').innerText = grandCovered;
+      document.getElementById('calc-left').innerText = left;
+
+      const activeEvt = events.find(e => e.id === activeEventId);
+      if (activeEvt) {
+        const today = new Date();
+        const targetDate = new Date(activeEvt.end);
+        const diffDays = Math.max(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24)), 1);
+        const pace = (left / diffDays).toFixed(1);
+        document.getElementById('calc-pace').innerText = pace;
+      } else {
+        document.getElementById('calc-pace').innerText = '0';
+      }
+
+      document.getElementById('pie-slice').setAttribute('stroke-dasharray', `${calcPct} 100`);
+    }
+
+    // CLIPBOARD TAB
+    function openNewClipboardModal() {
+      document.getElementById('cb-name-input').value = '';
+      document.getElementById('cb-date-input').value = '';
+      document.getElementById('new-clipboard-modal').style.display = 'flex';
+    }
+
+    function closeNewClipboardModal() {
+      document.getElementById('new-clipboard-modal').style.display = 'none';
+    }
+
+    function saveNewClipboard() {
+      const name = document.getElementById('cb-name-input').value.trim();
+      const date = document.getElementById('cb-date-input').value;
+      if (!name || !date) return;
+
+      clipboardList.push({
+        id: 'cb-' + Date.now(),
+        name,
+        date,
+        tasks: []
+      });
+      localStorage.setItem('ace_clipboards', JSON.stringify(clipboardList));
+      closeNewClipboardModal();
+      renderClipboards();
+    }
+
+    function deleteClipboard(cbId) {
+      clipboardList = clipboardList.filter(c => c.id !== cbId);
+      localStorage.setItem('ace_clipboards', JSON.stringify(clipboardList));
+      renderClipboards();
+    }
+
+    function openAddTaskModal(cbId) {
+      document.getElementById('task-modal-cb-id').value = cbId;
+      document.getElementById('task-name-input').value = '';
+      document.getElementById('add-task-modal').style.display = 'flex';
+    }
+
+    function closeAddTaskModal() {
+      document.getElementById('add-task-modal').style.display = 'none';
+    }
+
+    function saveNewTask() {
+      const cbId = document.getElementById('task-modal-cb-id').value;
+      const text = document.getElementById('task-name-input').value.trim();
+      if (!text) return;
+
+      const cb = clipboardList.find(c => c.id === cbId);
+      if (cb) {
+        cb.tasks.push({
+          id: 't-' + Date.now(),
+          text,
+          done: false
+        });
+        localStorage.setItem('ace_clipboards', JSON.stringify(clipboardList));
+        renderClipboards();
+      }
+      closeAddTaskModal();
+    }
+
+    function deleteTask(cbId, taskId) {
+      const cb = clipboardList.find(c => c.id === cbId);
+      if (cb) {
+        cb.tasks = cb.tasks.filter(t => t.id !== taskId);
+        localStorage.setItem('ace_clipboards', JSON.stringify(clipboardList));
+        renderClipboards();
+      }
+    }
+
+    function toggleTaskDone(cbId, taskId, isDone) {
+      const cb = clipboardList.find(c => c.id === cbId);
+      if (cb) {
+        const task = cb.tasks.find(t => t.id === taskId);
+        if (task) {
+          task.done = isDone;
+          localStorage.setItem('ace_clipboards', JSON.stringify(clipboardList));
+          renderClipboards();
+        }
+      }
+    }
+
+    function renderClipboards() {
+      const container = document.getElementById('clipboard-container');
+      container.innerHTML = '';
+      if (clipboardList.length === 0) {
+        container.innerHTML = `<div style="font-size:12px; color:var(--subtext);">No clipboards yet. Click + New Clipboard to create one.</div>`;
+        return;
+      }
+
+      clipboardList.forEach(cb => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.position = 'relative';
+
+        let tasksHtml = '';
+        cb.tasks.forEach(t => {
+          tasksHtml += `
+            <li style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTaskDone('${cb.id}', '${t.id}', this.checked)">
+                <span style="${t.done ? 'text-decoration: line-through; opacity:0.6;' : ''}">${t.text}</span>
+              </div>
+              <button class="btn-del-sm" onclick="deleteTask('${cb.id}', '${t.id}')">&times;</button>
+            </li>
+          `;
+        });
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid var(--border-color); padding-bottom:8px;">
+            <strong style="font-size:16px;">${cb.name}</strong>
+            <button class="btn-del-sm" onclick="deleteClipboard('${cb.id}')">&times;</button>
+          </div>
+          <div style="font-size:11px; color:var(--subtext); margin-bottom:12px;">Target Date: ${cb.date}</div>
+          <ul class="chap-list" style="max-height:140px; margin-bottom:12px;">
+            ${tasksHtml || '<li style="color:var(--subtext); font-size:12px;">No tasks added yet</li>'}
+          </ul>
+          <button class="btn" style="width:100%; font-size:12px;" onclick="openAddTaskModal('${cb.id}')">+ Add Task</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // HOMEWORK TAB
+    function addHW() {
+      const sub = document.getElementById('hw-sub').value.trim();
+      const task = document.getElementById('hw-task').value.trim();
+      const date = document.getElementById('hw-date').value;
+
+      if (!sub || !task) return;
+
+      hwList.push({ id: 'hw-' + Date.now(), sub, task, date, done: false });
+      localStorage.setItem('ace_hw', JSON.stringify(hwList));
+
+      document.getElementById('hw-sub').value = '';
+      document.getElementById('hw-task').value = '';
+      document.getElementById('hw-date').value = '';
+      renderHW();
+    }
+
+    function toggleHW(idx, isDone) {
+      if (hwList[idx]) {
+        hwList[idx].done = isDone;
+        localStorage.setItem('ace_hw', JSON.stringify(hwList));
+        renderHW();
+      }
+    }
+
+    function renderHW() {
+      const tbody = document.getElementById('hw-table-body');
+      tbody.innerHTML = '';
+      hwList.forEach((hw, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="text-align:center;"><input type="checkbox" ${hw.done ? 'checked' : ''} onchange="toggleHW(${idx}, this.checked)"></td>
+          <td style="color:${getSubjectColor(hw.sub)}; font-weight:bold;">${hw.sub}</td>
+          <td style="${hw.done ? 'text-decoration:line-through; opacity:0.6;' : ''}">${hw.task}</td>
+          <td>${hw.date || '--'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // GRADE TRACKER TAB
+    function addGrade() {
+      const sub = document.getElementById('gt-sub').value.trim();
+      const comp = document.getElementById('gt-comp').value.trim();
+      const score = parseFloat(document.getElementById('gt-score').value);
+      const total = parseFloat(document.getElementById('gt-total').value);
+
+      if (!sub || !comp || isNaN(score) || isNaN(total) || total <= 0) return;
+
+      const pct = Math.round((score / total) * 100);
+      let grade = 'U';
+      if (pct >= 90) grade = 'A*';
+      else if (pct >= 80) grade = 'A';
+      else if (pct >= 70) grade = 'B';
+      else if (pct >= 60) grade = 'C';
+      else if (pct >= 50) grade = 'D';
+      else if (pct >= 40) grade = 'E';
+
+      gradesList.push({ subject: sub, component: comp, score, total, pct, grade });
+      localStorage.setItem('ace_grades', JSON.stringify(gradesList));
+
+      document.getElementById('gt-sub').value = '';
+      document.getElementById('gt-comp').value = '';
+      document.getElementById('gt-score').value = '';
+      document.getElementById('gt-total').value = '';
+
+      renderGrades();
+      renderGradeGraph();
+    }
+
+    function deleteGrade(idx) {
+      gradesList.splice(idx, 1);
+      localStorage.setItem('ace_grades', JSON.stringify(gradesList));
+      renderGrades();
+      renderGradeGraph();
+    }
+
+    // PPQ TAB
+    function addPPQ() {
+      const sub = document.getElementById('ppq-sub').value.trim();
+      const paperCode = document.getElementById('ppq-paper-code').value.trim();
+      const score = document.getElementById('ppq-score').value.trim();
+      const date = document.getElementById('ppq-date').value;
+
+      if (!sub || !paperCode || !score) return;
+
+      ppqList.push({ sub, paperCode, score, date });
+      localStorage.setItem('ace_ppq', JSON.stringify(ppqList));
+
+      document.getElementById('ppq-sub').value = '';
+      document.getElementById('ppq-paper-code').value = '';
+      document.getElementById('ppq-score').value = '';
+      document.getElementById('ppq-date').value = '';
+
+      renderPPQ();
+    }
+
+    function deletePPQ(idx) {
+      ppqList.splice(idx, 1);
+      localStorage.setItem('ace_ppq', JSON.stringify(ppqList));
+      renderPPQ();
+    }
+
+    let scheduleConfig = JSON.parse(localStorage.getItem('ace_schedule_config')) || {
+      title: "Classes & Study Schedule Active",
+      recurrence: "daily",
+      startTime: "09:00 AM",
+      endTime: "05:00 PM"
+    };
+
+    function openScheduleModal() {
+      document.getElementById('sch-title-input').value = scheduleConfig.title;
+      document.getElementById('sch-recurrence-input').value = scheduleConfig.recurrence;
+      document.getElementById('sch-start-time').value = scheduleConfig.startTime;
+      document.getElementById('sch-end-time').value = scheduleConfig.endTime;
+      document.getElementById('schedule-modal').style.display = 'flex';
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('schedule-modal').style.display = 'none';
+    }
+
+    function saveScheduleSettings() {
+      const title = document.getElementById('sch-title-input').value.trim() || "Classes & Study Schedule Active";
+      const recurrence = document.getElementById('sch-recurrence-input').value;
+      const startTime = document.getElementById('sch-start-time').value.trim() || "09:00 AM";
+      const endTime = document.getElementById('sch-end-time').value.trim() || "05:00 PM";
+
+      scheduleConfig = { title, recurrence, startTime, endTime };
+      localStorage.setItem('ace_schedule_config', JSON.stringify(scheduleConfig));
+
+      updateScheduleBanner();
+      closeScheduleModal();
+    }
+
+    function updateScheduleBanner() {
+      const d = new Date();
+      document.getElementById('header-date').innerText = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('banner-class-title').innerText = scheduleConfig.title;
+      document.getElementById('banner-class-time').innerText = `${scheduleConfig.startTime} – ${scheduleConfig.endTime}`;
+      
+      const recLabels = {
+        daily: "Recurrence: Daily Event",
+        weekly: "Recurrence: Weekly Event",
+        monthly: "Recurrence: Monthly Event",
+        yearly: "Recurrence: Yearly Event",
+        standalone: "Type: Standalone Event"
+      };
+      document.getElementById('banner-recurrence-type').innerText = recLabels[scheduleConfig.recurrence] || "Recurrence: Daily Event";
+    }
+
+    function getMiniPieSvg(covered, total, strokeColor) {
+      if (total <= 0) total = 1;
+      const pct = Math.min(Math.max((covered / total) * 100, 0), 100);
+      return `
+        <svg width="26" height="26" viewBox="0 0 36 36" style="display:inline-block; vertical-align:middle; flex-shrink:0;">
+          <circle r="15.9155" cx="18" cy="18" fill="none" stroke="#3c4043" stroke-width="5"/>
+          <circle r="15.9155" cx="18" cy="18" fill="none" stroke="${strokeColor}" stroke-width="5" stroke-dasharray="${pct} 100" stroke-dashoffset="0" transform="rotate(-90 18 18)"/>
+        </svg>
+      `;
+    }
+
+    function renderSubjects() {
+      let currentSyllabus = getActiveSyllabus();
+      const container = document.getElementById('subject-cards');
+      container.innerHTML = '';
+
+      let grandTotal = 0;
+      let grandCovered = 0;
+
+      for (let sub in currentSyllabus) {
+        const chapters = currentSyllabus[sub];
+        const subColor = getSubjectColor(sub);
+        
+        let doneCount = 0;
+        chapters.forEach(c => {
+          if (checkedChaps[`${activeEventId}-${sub}-${c}`]) doneCount++;
+        });
+
+        grandTotal += chapters.length;
+        grandCovered += doneCount;
+
+        const card = document.createElement('div');
+        card.className = 'subject-card';
+        card.style.borderTop = `4px solid ${subColor}`;
+
+        let chapHtml = '';
+        chapters.forEach(c => {
+          const isDone = !!checkedChaps[`${activeEventId}-${sub}-${c}`];
+          chapHtml += `
+            <li>
+              <div class="chap-left">
+                <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleChap('${sub}', '${c.replace(/'/g, "\\'")}', this.checked)">
+                <span style="${isDone ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${c}</span>
+              </div>
+              <button class="btn-del-sm" onclick="deleteChapter('${sub}', '${c.replace(/'/g, "\\'")}')">&times;</button>
+            </li>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="subject-header">
+            <div class="subject-title" style="color:${subColor};">${sub}</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${getMiniPieSvg(doneCount, chapters.length, subColor)}
+              <span style="font-size:12px; font-weight:bold; color:var(--subtext);">${doneCount}/${chapters.length}</span>
+              <button class="dots-btn" onclick="openSubjectModal('${sub.replace(/'/g, "\\'")}')">&#8942;</button>
+            </div>
+          </div>
+          <ul class="chap-list">
+            ${chapHtml}
+          </ul>
+          <div style="margin-top: 10px;">
+            <button class="btn" style="width:100%; font-size:12px; padding:4px;" onclick="addChapter('${sub.replace(/'/g, "\\'")}')">+ Add Chapter</button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+
+      const calcPct = grandTotal > 0 ? Math.round((grandCovered / grandTotal) * 100) : 0;
+      const left = grandTotal - grandCovered;
+
+      document.getElementById('calc-total').innerText = grandTotal;
+      document.getElementById('calc-completion').innerText = calcPct + '%';
+      document.getElementById('calc-covered').innerText = grandCovered;
+      document.getElementById('calc-left').innerText = left;
+
+      const activeEvt = events.find(e => e.id === activeEventId);
+      if (activeEvt) {
+        const today = new Date();
+        const targetDate = new Date(activeEvt.end);
+        const diffDays = Math.max(Math.ceil((targetDate - today) / (1000 * 60 * 60 * 24)), 1);
+        const pace = (left / diffDays).toFixed(1);
+        document.getElementById('calc-pace').innerText = pace;
+      } else {
+        document.getElementById('calc-pace').innerText = '0';
+      }
+
+      document.getElementById('pie-slice').setAttribute('stroke-dasharray', `${calcPct} 100`);
+    }
+
+    function renderGrades() {
+      const tbody = document.getElementById('grade-table-body');
+      tbody.innerHTML = '';
+      gradesList.forEach((g, idx) => {
+        const tr = document.createElement('tr');
+        // Updated thresholds: Green >=70%, Yellow 50-69%, Red <50%
+        const badgeClass = g.pct >= 70 ? 'badge-success' : g.pct >= 50 ? 'badge-warning' : 'badge-danger';
+        tr.innerHTML = `
+          <td style="color:${getSubjectColor(g.subject)}; font-weight:bold;">${g.subject}</td>
+          <td>${g.component}</td>
+          <td>${g.score} / ${g.total}</td>
+          <td>${g.pct}%</td>
+          <td><span class="badge ${badgeClass}">${g.grade}</span></td>
+          <td><button class="btn-del-sm" onclick="deleteGrade(${idx})">&times;</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderGradeGraph() {
+      const canvas = document.getElementById('gradeTrendCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      ctx.clearRect(0, 0, rect.width, rect.height);
+
+      const subjects = [...new Set(gradesList.map(g => g.subject))];
+      const components = [...new Set(gradesList.map(g => g.component))];
+
+      const legend = document.getElementById('graph-legend');
+      legend.innerHTML = '';
+
+      subjects.forEach(sub => {
+        const color = getSubjectColor(sub);
+        legend.innerHTML += `<div class="legend-item" style="display:inline-flex; align-items:center; gap:6px; margin: 0 8px;"><div class="legend-color" style="width:12px; height:12px; border-radius:50%; background:${color}"></div><span style="font-size:13px; font-weight:bold;">${sub}</span></div>`;
+      });
+
+      if (components.length === 0) return;
+
+      // Uncluttered, generous paddings for desktop & tablet Y-axis visibility
+      const paddingLeft = 85;
+      const paddingBottom = 55;
+      const paddingTop = 30;
+      const paddingRight = 40;
+
+      const chartWidth = rect.width - paddingLeft - paddingRight;
+      const chartHeight = rect.height - paddingTop - paddingBottom;
+
+      const textColor = getComputedStyle(document.body).getPropertyValue('--subtext').trim() || '#9aa0a6';
+
+      // Draw Grid & Y-Axis Labels (Percentages & Grades) with extra spacing
+      ctx.strokeStyle = '#2d3135';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = textColor;
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+
+      const yTicks = [
+        { pct: 100, label: '100% (A*)' },
+        { pct: 80, label: '80% (A)' },
+        { pct: 70, label: '70% (B)' },
+        { pct: 60, label: '60% (C)' },
+        { pct: 50, label: '50% (D)' },
+        { pct: 40, label: '40% (E)' },
+        { pct: 0, label: '0% (U)' }
+      ];
+
+      yTicks.forEach(tick => {
+        const y = paddingTop + (1 - tick.pct / 100) * chartHeight;
+        
+        ctx.beginPath();
+        ctx.moveTo(paddingLeft, y);
+        ctx.lineTo(rect.width - paddingRight, y);
+        ctx.stroke();
+
+        ctx.fillText(tick.label, paddingLeft - 10, y);
+      });
+
+      // Y-Axis Title
+      ctx.save();
+      ctx.translate(22, rect.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color').trim() || '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('Grades & Percentage (%)', 0, 0);
+      ctx.restore();
+
+      // X-Axis Baseline & Labels (Exams)
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      components.forEach((comp, idx) => {
+        const x = paddingLeft + (idx / Math.max(components.length - 1, 1)) * chartWidth;
+        ctx.fillStyle = textColor;
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(comp, x, rect.height - paddingBottom + 10);
+      });
+
+      // X-Axis Title
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color').trim() || '#ffffff';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('Exams / Components', paddingLeft + chartWidth / 2, rect.height - 18);
+
+      // Plot Subject Trend Lines
+      subjects.forEach(sub => {
+        const subData = gradesList.filter(g => g.subject === sub);
+        const subColor = getSubjectColor(sub);
+
+        ctx.strokeStyle = subColor;
+        ctx.fillStyle = subColor;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+
+        let started = false;
+        components.forEach((comp, idx) => {
+          const item = subData.find(g => g.component === comp);
+          if (item) {
+            const x = paddingLeft + (idx / Math.max(components.length - 1, 1)) * chartWidth;
+            const y = paddingTop + (1 - item.pct / 100) * chartHeight;
+
+            if (!started) {
+              ctx.moveTo(x, y);
+              started = true;
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+        });
+        ctx.stroke();
+
+        components.forEach((comp, idx) => {
+          const item = subData.find(g => g.component === comp);
+          if (item) {
+            const x = paddingLeft + (idx / Math.max(components.length - 1, 1)) * chartWidth;
+            const y = paddingTop + (1 - item.pct / 100) * chartHeight;
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      });
+    }
+
+    function renderPPQ() {
+      const tbody = document.getElementById('ppq-table-body');
+      tbody.innerHTML = '';
+      ppqList.forEach((p, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color:${getSubjectColor(p.sub)}; font-weight:bold;">${p.sub}</td>
+          <td>${p.paperCode}</td>
+          <td>${p.score}%</td>
+          <td>${p.date || '--'}</td>
+          <td><button class="btn-del-sm" onclick="deletePPQ(${idx})">&times;</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const summaryMap = {};
+      ppqList.forEach(p => {
+        const codeMatch = p.paperCode.match(/\/(\d+)\//);
+        const code = codeMatch ? codeMatch[1] : p.paperCode;
+        const key = `${p.sub} ${code}`;
+
+        if (!summaryMap[key]) summaryMap[key] = { scores: [] };
+        summaryMap[key].scores.push(parseFloat(p.score));
+      });
+
+      const summaryTbody = document.getElementById('ppq-summary-table-body');
+      summaryTbody.innerHTML = '';
+
+      for (let key in summaryMap) {
+        const arr = summaryMap[key].scores;
+        const avg = Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
+        let grade = 'U';
+        if (avg >= 90) grade = 'A*';
+        else if (avg >= 80) grade = 'A';
+        else if (avg >= 70) grade = 'B';
+        else if (avg >= 60) grade = 'C';
+        else if (avg >= 50) grade = 'D';
+        else if (avg >= 40) grade = 'E';
+
+        // Updated thresholds: Green >=70%, Yellow 50-69%, Red <50%
+        const badgeClass = avg >= 70 ? 'badge-success' : avg >= 50 ? 'badge-warning' : 'badge-danger';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${key}</strong></td>
+          <td>${avg}%</td>
+          <td>${avg}%</td>
+          <td><span class="badge ${badgeClass}">${grade}</span></td>
+        `;
+        summaryTbody.appendChild(tr);
+      }
+
+      document.getElementById('papers-total-count').innerText = ppqList.length;
+
+      const activeEvt = events.find(e => e.id === activeEventId);
+      if (activeEvt && activeEvt.end) {
+        const targetDate = new Date(activeEvt.end);
+        const beforeCount = ppqList.filter(p => p.date && new Date(p.date) <= targetDate).length;
+        document.getElementById('papers-before-exam-count').innerText = beforeCount;
+      } else {
+        document.getElementById('papers-before-exam-count').innerText = ppqList.length;
+      }
+    }
+
+    // PPQ BOOKLETS TAB
+    function toggleWorkbookForm() {
+      const f = document.getElementById('workbook-form');
+      f.style.display = f.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function toggleTopicalForm() {
+      const f = document.getElementById('topical-form');
+      f.style.display = f.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function addWorkbookItem() {
+      const sub = document.getElementById('wb-sub').value.trim();
+      const chap = document.getElementById('wb-chap').value.trim();
+      const done = parseInt(document.getElementById('wb-done').value) || 0;
+      const total = parseInt(document.getElementById('wb-total').value) || 0;
+
+      if (!sub || !chap || total <= 0) return;
+
+      workbookList.push({ sub, chap, done, total });
+      localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+      renderBooklets();
+
+      document.getElementById('wb-sub').value = '';
+      document.getElementById('wb-chap').value = '';
+      document.getElementById('wb-done').value = '';
+      document.getElementById('wb-total').value = '';
+      toggleWorkbookForm();
+    }
+
+    function addTopicalItem() {
+      const sub = document.getElementById('top-sub').value.trim();
+      const topic = document.getElementById('top-topic').value.trim();
+      const done = parseInt(document.getElementById('top-done').value) || 0;
+      const total = parseInt(document.getElementById('top-total').value) || 0;
+
+      if (!sub || !topic || total <= 0) return;
+
+      topicalList.push({ sub, topic, done, total });
+      localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+      renderBooklets();
+
+      document.getElementById('top-sub').value = '';
+      document.getElementById('top-topic').value = '';
+      document.getElementById('top-done').value = '';
+      document.getElementById('top-total').value = '';
+      toggleTopicalForm();
+    }
+
+    function adjustWbPages(idx, delta) {
+      if (workbookList[idx]) {
+        workbookList[idx].done = Math.min(Math.max(0, workbookList[idx].done + delta), workbookList[idx].total);
+        localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+        renderBooklets();
+      }
+    }
+
+    function updateWbPagesInput(idx, val) {
+      if (workbookList[idx]) {
+        let parsed = parseInt(val) || 0;
+        workbookList[idx].done = Math.min(Math.max(0, parsed), workbookList[idx].total);
+        localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+        renderBooklets();
+      }
+    }
+
+    function adjustTopPages(idx, delta) {
+      if (topicalList[idx]) {
+        topicalList[idx].done = Math.min(Math.max(0, topicalList[idx].done + delta), topicalList[idx].total);
+        localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+        renderBooklets();
+      }
+    }
+
+    function updateTopPagesInput(idx, val) {
+      if (topicalList[idx]) {
+        let parsed = parseInt(val) || 0;
+        topicalList[idx].done = Math.min(Math.max(0, parsed), topicalList[idx].total);
+        localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+        renderBooklets();
+      }
+    }
+
+    function deleteWorkbook(idx) {
+      workbookList.splice(idx, 1);
+      localStorage.setItem('ace_workbook', JSON.stringify(workbookList));
+      renderBooklets();
+    }
+
+    function deleteTopical(idx) {
+      topicalList.splice(idx, 1);
+      localStorage.setItem('ace_topical', JSON.stringify(topicalList));
+      renderBooklets();
+    }
+
+    function renderBooklets() {
+      const wbContainer = document.getElementById('workbook-subject-container');
+      const topContainer = document.getElementById('topical-subject-container');
+
+      wbContainer.innerHTML = '';
+      topContainer.innerHTML = '';
+
+      const wbGrouped = {};
+      workbookList.forEach((item, originalIdx) => {
+        if (!wbGrouped[item.sub]) wbGrouped[item.sub] = [];
+        wbGrouped[item.sub].push({ ...item, idx: originalIdx });
+      });
+
+      for (let sub in wbGrouped) {
+        const subColor = getSubjectColor(sub);
+        const card = document.createElement('div');
+        card.className = 'subj-group-card';
+        card.innerHTML = `<div class="subj-group-title" style="color:${subColor};">${sub}</div>`;
+
+        wbGrouped[sub].forEach(item => {
+          const pct = Math.round((item.done / item.total) * 100);
+          card.innerHTML += `
+            <div style="margin-bottom:12px; background:var(--card-bg); padding:10px; border-radius:var(--app-radius); border:1px solid var(--border-color);">
+              <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
+                <span>${item.chap}</span>
+                <button class="btn-del-sm" onclick="deleteWorkbook(${item.idx})">&times;</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--subtext); margin-bottom:6px;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="page-cnt-btn" onclick="adjustWbPages(${item.idx}, -1)">-</button>
+                  <input type="number" value="${item.done}" style="width:48px; text-align:center; padding:2px;" onchange="updateWbPagesInput(${item.idx}, this.value)">
+                  <button class="page-cnt-btn" onclick="adjustWbPages(${item.idx}, 1)">+</button>
+                  <span>/ ${item.total} pages</span>
+                </div>
+                <span>${pct}% completed</span>
+              </div>
+              <div class="event-progress-bar">
+                <div class="event-progress-fill" style="width:${pct}%; background:${subColor};"></div>
+              </div>
+            </div>
+          `;
+        });
+        wbContainer.appendChild(card);
+      }
+
+      const topGrouped = {};
+      topicalList.forEach((item, originalIdx) => {
+        if (!topGrouped[item.sub]) topGrouped[item.sub] = [];
+        topGrouped[item.sub].push({ ...item, idx: originalIdx });
+      });
+
+      for (let sub in topGrouped) {
+        const subColor = getSubjectColor(sub);
+        const card = document.createElement('div');
+        card.className = 'subj-group-card';
+        card.innerHTML = `<div class="subj-group-title" style="color:${subColor};">${sub}</div>`;
+
+        topGrouped[sub].forEach(item => {
+          const pct = Math.round((item.done / item.total) * 100);
+          card.innerHTML += `
+            <div style="margin-bottom:12px; background:var(--card-bg); padding:10px; border-radius:var(--app-radius); border:1px solid var(--border-color);">
+              <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:bold; margin-bottom:4px;">
+                <span>${item.topic}</span>
+                <button class="btn-del-sm" onclick="deleteTopical(${item.idx})">&times;</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--subtext); margin-bottom:6px;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <button class="page-cnt-btn" onclick="adjustTopPages(${item.idx}, -1)">-</button>
+                  <input type="number" value="${item.done}" style="width:48px; text-align:center; padding:2px;" onchange="updateTopPagesInput(${item.idx}, this.value)">
+                  <button class="page-cnt-btn" onclick="adjustTopPages(${item.idx}, 1)">+</button>
+                  <span>/ ${item.total} pages</span>
+                </div>
+                <span>${pct}% completed</span>
+              </div>
+              <div class="event-progress-bar">
+                <div class="event-progress-fill" style="width:${pct}%; background:${subColor};"></div>
+              </div>
+            </div>
+          `;
+        });
+        topContainer.appendChild(card);
+      }
+    }
+
+    // POMODORO TIMER
+    let pomoSeconds = 25 * 60;
+    let pomoInterval = null;
+
+    function updatePomoDisplay() {
+      const m = Math.floor(pomoSeconds / 60).toString().padStart(2, '0');
+      const s = (pomoSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('pomo-display').innerText = `${m}:${s}`;
+    }
+
+    function applyCustomPomo() {
+      const val = parseInt(document.getElementById('pomo-input-min').value);
+      if (val && val > 0) {
+        pausePomo();
+        pomoSeconds = val * 60;
+        updatePomoDisplay();
+      }
+    }
+
+    function startPomo() {
+      if (pomoInterval) return;
+      pomoInterval = setInterval(() => {
+        if (pomoSeconds > 0) {
+          pomoSeconds--;
+          updatePomoDisplay();
+        } else {
+          pausePomo();
+          alert("Focus time completed!");
+        }
+      }, 1000);
+    }
+
+    function pausePomo() {
+      clearInterval(pomoInterval);
+      pomoInterval = null;
+    }
+
+    function resetPomo() {
+      pausePomo();
+      const val = parseInt(document.getElementById('pomo-input-min').value) || 25;
+      pomoSeconds = val * 60;
+      updatePomoDisplay();
+    }
+
+    // SCHEDULE BANNER DETECTOR
+    function updateScheduleBanner() {
+      const d = new Date();
+      document.getElementById('header-date').innerText = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('banner-class-title').innerText = "Classes & Study Schedule Active";
+      document.getElementById('banner-class-time').innerText = "09:00 AM – 05:00 PM";
+    }
+
+    window.onload = function() {
+      if (currentBaseTheme !== 'dark') changeTheme(currentBaseTheme);
+      applyCustomAppAccent(currentAppAccent);
+
+      updateScheduleBanner();
+      renderEvents();
+      renderSubjects();
+      renderGrades();
+      renderHW();
+      renderClipboards();
+      renderPPQ();
+      renderBooklets();
+
+      window.addEventListener('resize', renderGradeGraph);
+    };
+  </script>
+</body>
+</html>
